@@ -21,6 +21,16 @@
 #' @param location a `character` used to describe the geographic location of the
 #'   contact; defaults to `default`
 #'
+#' @example
+#' 
+#' x <- make_ctdata(
+#'   contact_id = c(1, 1, 2, 3), 
+#'   date = Sys.Date() - c(6, 4, 2, 2),
+#'   type = c("normal", "funeral", "normal", "normal"),
+#'   location = "some-town"
+#' )
+#' x
+#' class(x)
 
 make_ctdata <- function(contact_id,
                         date, 
