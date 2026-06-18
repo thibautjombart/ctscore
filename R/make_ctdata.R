@@ -21,7 +21,7 @@
 #' @param location a `character` used to describe the geographic location of the
 #'   contact; defaults to `default`
 #'
-#' @example
+#' @examples
 #' 
 #' x <- make_ctdata(
 #'   contact_id = c(1, 1, 2, 3), 
