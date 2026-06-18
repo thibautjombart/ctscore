@@ -6,3 +6,11 @@ ctscore: Contact Tracing Scoring System
 <!-- Variables marked with double curly braces will be transformed beforehand: -->
 <!-- `packagename` is extracted from the DESCRIPTION file -->
 <!-- `gh_repo` is extracted via a special environment variable in GitHub Actions -->
+
+## Getting started
+
+To install the package from github:
+
+``` r
+pak::pkg_install("thibautjombart/ctscore")
+```
