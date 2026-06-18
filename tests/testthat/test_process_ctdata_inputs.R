@@ -1,7 +1,7 @@
 test_that(
   "process_contact_id() works as expected", 
   {
-    msg <- 'inherits\\(x, c\\("character", "numeric"\\)\\) is not TRUE'
+    msg <- 'inherits\\(x, c\\("character", "numeric", "integer"\\)\\) is not TRUE'
     expect_error(process_contact_id(NULL), msg)
     
     expect_identical(

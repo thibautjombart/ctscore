@@ -29,13 +29,14 @@ make_ctdata <- function(contact_id,
                         type = "default", 
                         location = "default"
                         ) {
-  data.frame(
+  out <- data.frame(
     contact_id = process_contact_id(contact_id), 
     date = process_date(date), 
     type = process_type(type), 
-    location = process_location(type)
+    location = process_location(location)
   )
-  
+  class(out) <- c("ctdata", class(out))
+  out
 }
 
 

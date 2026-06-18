@@ -21,7 +21,7 @@ process_contact_id <- function(x) {
   if (is.factor(x)) {
     x <- as.character(x)
   }
-  stopifnot(inherits(x, c("character", "numeric")))
+  stopifnot(inherits(x, c("character", "numeric", "integer")))
   x
 }
 
@@ -40,3 +40,22 @@ process_date <- function(x) {
   x
 }
 
+
+
+
+#' This function ensures 'type' is a character
+#' @rdname process_ctdata_inputs
+#' 
+process_type <- function(x) {
+  as.character(x)
+}
+
+
+
+
+#' This function ensures 'location' is a character
+#' @rdname process_ctdata_inputs
+#' 
+process_location <- function(x) {
+  as.character(x)
+}
