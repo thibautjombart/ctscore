@@ -15,7 +15,7 @@ NULL
 
 
 #' This function checks that contact IDs are either characters or numeric values
-#' @rdname process_ctdata_inputs
+#' @noRd
 #' 
 process_contact_id <- function(x) {
   if (is.factor(x)) {
@@ -29,7 +29,7 @@ process_contact_id <- function(x) {
 
 
 #' This function checks that dates are either Date or numeric values
-#' @rdname process_ctdata_inputs
+#' @noRd
 #' 
 process_date <- function(x) {
  
@@ -44,7 +44,7 @@ process_date <- function(x) {
 
 
 #' This function ensures 'type' is a character
-#' @rdname process_ctdata_inputs
+#' @noRd
 #' 
 process_type <- function(x) {
   as.character(x)
@@ -54,7 +54,7 @@ process_type <- function(x) {
 
 
 #' This function ensures 'location' is a character
-#' @rdname process_ctdata_inputs
+#' @noRd
 #' 
 process_location <- function(x) {
   as.character(x)

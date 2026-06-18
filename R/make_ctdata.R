@@ -21,9 +21,7 @@
 #' @param location a `character` used to describe the geographic location of the
 #'   contact; defaults to `default`
 #'
-#' @param date_format a `character` indicating the format of the dates; used
-#'   only if `date` is a `character`, in which case it is passed as the `format`
-#'   argument of `as.Date`; in the absence of format (default), 
+
 make_ctdata <- function(contact_id,
                         date, 
                         type = "default", 
