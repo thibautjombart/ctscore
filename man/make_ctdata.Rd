@@ -4,7 +4,13 @@
 \alias{make_ctdata}
 \title{Build a ctdata object}
 \usage{
-make_ctdata(contact_id, date, type = "default", location = "default")
+make_ctdata(
+  contact_id,
+  date,
+  type = "default",
+  location = "default",
+  infection_proba = list(default = 0)
+)
 }
 \arguments{
 \item{contact_id}{a \code{character} or a \code{numeric} vector indicating identifiers
@@ -20,6 +26,14 @@ done before creating a \code{ctdata} object}
 
 \item{location}{a \code{character} used to describe the geographic location of the
 contact; defaults to \code{default}}
+
+\item{infection_proba}{a \code{list} of named numeric values, each indicating the
+probability of infection for a given contact; defaults to a list with
+'default' exposure having a probability of infection of 0}
+}
+\value{
+A \code{ctdata} object, which is a validated \code{data.frame} designed to be
+used in the \link{ctscore} function.
 }
 \description{
 This constructor will build a \code{ctdata} object from different inputs
@@ -31,7 +45,8 @@ x <- make_ctdata(
   contact_id = c(1, 1, 2, 3), 
   date = Sys.Date() - c(6, 4, 2, 2),
   type = c("normal", "funeral", "normal", "normal"),
-  location = "some-town"
+  location = "some-town",
+  infection_proba = list(normal = 0.2, funeral = 0.9)
 )
 x
 class(x)
