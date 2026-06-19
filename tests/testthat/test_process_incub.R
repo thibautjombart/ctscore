@@ -26,6 +26,11 @@ test_that(
     expect_equal(length(res), 13L)
     expect_equal(res, rep(1/13, 13))  
   
+    ## check distcrete objects work
+    x <- distcrete::distcrete("norm", mean = 12, sd = 10, interval = 1L)
+    res <- process_incub(x, max_delay = 21)
+    expect_equal(sum(res), 1L)
+    expect_true(all(res >= 0))
   }
 )
     
