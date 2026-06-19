@@ -47,7 +47,8 @@ test_that(
       contact_id = id, 
       date = date_txt, 
       type = type, 
-      location = location
+      location = location, 
+      infection_proba = list(normal = 0.1, funeral = 0.5)
     )
     
     expect_true(inherits(res, "ctdata"))

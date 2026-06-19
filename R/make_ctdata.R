@@ -20,7 +20,10 @@
 #'
 #' @param location a `character` used to describe the geographic location of the
 #'   contact; defaults to `default`
-#'
+#'   
+#' @param infection_proba a `list` of named numeric values, each indicating the 
+#'  probability of infection for a given contact; defaults to an empty list
+#'  
 #' @examples
 #' 
 #' x <- make_ctdata(
@@ -35,7 +38,8 @@
 make_ctdata <- function(contact_id,
                         date, 
                         type = "default", 
-                        location = "default"
+                        location = "default", 
+                        infection_proba = list()
                         ) {
   out <- data.frame(
     contact_id = process_contact_id(contact_id), 
@@ -44,6 +48,11 @@ make_ctdata <- function(contact_id,
     location = process_location(location)
   )
   class(out) <- c("ctdata", class(out))
+  
+  ## process the infection_proba argument and add infection probabilities to the
+  ## final object
+  infection_proba <- process_infection_proba(infection_proba, out)
+  
   out
 }
 
