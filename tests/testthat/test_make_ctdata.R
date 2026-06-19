@@ -19,11 +19,11 @@ test_that(
   res <- make_ctdata(contact_id = "toto", date = Sys.Date())
   expect_identical(
     dim(res),
-    c(1L, 4L)
+    c(1L, 5L)
   )
   expect_identical(
     names(res),
-    c("contact_id", "date", "type", "location")
+    c("contact_id", "date", "type", "location", "p_infection")
   )
   
   expect_true(inherits(res, "ctdata"))
@@ -47,7 +47,8 @@ test_that(
       contact_id = id, 
       date = date_txt, 
       type = type, 
-      location = location
+      location = location, 
+      infection_proba = list(normal = 0.1, funeral = 0.5)
     )
     
     expect_true(inherits(res, "ctdata"))
