@@ -15,7 +15,8 @@ Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 Imports:
-Suggests: 
+Suggests:
+    distcrete,
     knitr,
     rmarkdown,
     testthat (>= 3.0.0)
