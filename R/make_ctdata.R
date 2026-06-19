@@ -25,8 +25,9 @@
 #'  probability of infection for a given contact; defaults to a list with
 #'  'default' exposure having a probability of infection of 0
 #'  
-#' @return A `ctdata` object, which is a validated `data.frame` designed to be
-#'   used in the [ctscore] function.
+#' @return A `ctdata` object, which is a validated and ordered (by contact ID
+#'   and date of exposure) `data.frame` designed to be used in the [ctscore] 
+#'   function.
 #'   
 #' @examples
 #' 
@@ -57,6 +58,9 @@ make_ctdata <- function(contact_id,
   ## process the infection_proba argument and add infection probabilities to the
   ## final object; all input checking is done inside add_infection_proba()
   out <- add_infection_proba(out, infection_proba)
+  
+  ## reorder output by: contact_id, date
+  out <- dplyr::arrange(out, contact_id, date)
   out
 }
 

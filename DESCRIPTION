@@ -16,6 +16,7 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 Imports:
 Suggests:
+    dplyr,
     distcrete,
     knitr,
     rmarkdown,

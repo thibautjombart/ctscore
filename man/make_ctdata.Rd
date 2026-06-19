@@ -32,8 +32,9 @@ probability of infection for a given contact; defaults to a list with
 'default' exposure having a probability of infection of 0}
 }
 \value{
-A \code{ctdata} object, which is a validated \code{data.frame} designed to be
-used in the \link{ctscore} function.
+A \code{ctdata} object, which is a validated and ordered (by contact ID
+and date of exposure) \code{data.frame} designed to be used in the \link{ctscore}
+function.
 }
 \description{
 This constructor will build a \code{ctdata} object from different inputs
