@@ -39,7 +39,7 @@ test_that(
   "Constructor does basic input processing and reordering",
   {
     id <- c(1, 1, 2)
-    date <- Sys.Date() - 1:3
+    date <- as.Date("2026-06-19") - 1:3
     type <- c("normal", "funeral", "funeral")
     location <- factor("town")
     date_txt <- as.character(date)
