@@ -6,7 +6,7 @@
 #' @author Thibaut Jombart
 #' @noRd
 #' 
-#' @param e the date at which the individual was infected
+#' @param e the date at which the individual was exposed
 #' @param s the date at which the individual was last seen and had no symptom
 #' @param t the current date
 #' @param incub the incubation time distribution, provided as a function
