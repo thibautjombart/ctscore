@@ -25,6 +25,9 @@
 #'  probability of infection for a given contact; defaults to a list with
 #'  'default' exposure having a probability of infection of 0
 #'  
+#' @param last_visit the date of the last visit to the contact, where they 
+#'   exhibited no symptoms; the type provided must match that of `date`
+#'  
 #' @return A `ctdata` object, which is a validated and ordered (by contact ID
 #'   and date of exposure) `data.frame` designed to be used in the [ctscore] 
 #'   function.
@@ -36,7 +39,8 @@
 #'   date = Sys.Date() - c(6, 4, 2, 2),
 #'   type = c("normal", "funeral", "normal", "normal"),
 #'   location = "some-town",
-#'   infection_proba = list(normal = 0.2, funeral = 0.9)
+#'   infection_proba = list(normal = 0.2, funeral = 0.9),
+#'   last_visit = Sys.Date() - c(4, 4, 1, 1)
 #' )
 #' x
 #' class(x)
@@ -45,13 +49,15 @@ make_ctdata <- function(contact_id,
                         date, 
                         type = "default", 
                         location = "default", 
-                        infection_proba = list(default = 0)
+                        infection_proba = list(default = 0), 
+                        last_visit
                         ) {
   out <- data.frame(
     contact_id = process_contact_id(contact_id), 
     date = process_date(date), 
     type = process_type(type), 
-    location = process_location(location)
+    location = process_location(location), 
+    last_visit = process_date(last_visit)
   )
   class(out) <- c("ctdata", class(out))
   

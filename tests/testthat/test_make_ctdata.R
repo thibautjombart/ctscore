@@ -16,14 +16,14 @@ test_that(
 test_that(
   "Constructor works with basic input", 
   {
-  res <- make_ctdata(contact_id = "toto", date = Sys.Date())
+  res <- make_ctdata(contact_id = "toto", date = Sys.Date(), last_visit = Sys.Date())
   expect_identical(
     dim(res),
-    c(1L, 5L)
+    c(1L, 6L)
   )
   expect_identical(
     names(res),
-    c("contact_id", "date", "type", "location", "p_infection")
+    c("contact_id", "date", "type", "location", "last_visit", "p_infection")
   )
   
   expect_true(inherits(res, "ctdata"))
@@ -48,7 +48,8 @@ test_that(
       date = date_txt, 
       type = type, 
       location = location, 
-      infection_proba = list(normal = 0.1, funeral = 0.5)
+      infection_proba = list(normal = 0.1, funeral = 0.5),
+      last_visit = date_txt
     )
     
     expect_true(inherits(res, "ctdata"))
@@ -58,6 +59,7 @@ test_that(
     expect_identical(res$type, c("funeral", "normal", "funeral"))
     expect_identical(res$location, rep("town", 3))
     expect_equal(res$p_infection, c(0.5, 0.1, 0.5))
-  
+    expect_identical(res$date, res$last_visit)
+    
   } 
 )
