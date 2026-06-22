@@ -1,7 +1,7 @@
 #' Calculate the probability of infection from past exposures
 #' 
 #' Internal. Used to calculate the probability that an infection took place at 
-#' a given exposure, accounting for previous ones.
+#' a given exposure, accounting for previous ones, for a single contact.
 #' 
 #' @author Thibaut Jombart
 #' @noRd
