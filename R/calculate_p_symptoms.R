@@ -20,10 +20,7 @@ calculate_p_symptoms <- function(e, s, t, incub) {
   num <- sum(incub(seq(s+1, t) - e))
   denom <- 1 - sum(incub(seq(e,s) - e))
   out <- num / denom
-  # if (denom < 1e-30) {
-  #   out <- 0
-  # }
-  
+ 
   ## fix mandatory zeros
   are_zero <- t <= s | t < e
   out[are_zero] <- 0
