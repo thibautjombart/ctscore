@@ -1,0 +1,41 @@
+# Simulating contact tracing data
+
+We simulate individual-level contact tracing data under a stochastic exposure, infection, and observation model. Each contact experiences a sequence of exposure events during a fixed observation window, with a subset of exposures potentially leading to infection. Infection status, symptom onset, and observation times are generated sequentially.
+
+For each of $n$ contacts, data are generated independently over an observation period of $D$ days with exposures occurring on days $1, \ldots, D$, and the end of the follow-up period denoted $t = D + 1$.
+
+
+## Exposure and infection process
+For each contact $i$, the number of exposures is:
+$$ K \sim 1 + \mathrm{Poisson}(1) $$
+
+Exposure times are sampled independently from a discrete uniform distribution over the observation window and ordered such that $t_{e_1} < \cdots < t_{e_K}$ with $t_{e_k} \sim \mathrm{Uniform}\{1, \ldots, D\}$. Each exposure is assigned a type determining its per-exposure transmission probability $\pi_{e_k}$ (*e.g.* household or funeral exposure; see equation 1).
+
+Consistent with the assumption that a contact can be infected at most once, each exposure independently led to transmission with probability $\pi_{e_k}$,
+
+$$ Y_k \sim \mathrm{Bernoulli}(\pi_{e_k}), \qquad k = 1, \ldots, K$$
+
+where $Y_k = 1$ denotes transmission at exposure $e_k$.
+
+Infection occurs at the first successful transmission event, with index $\kappa = \min\{k : Y_k = 1\}$ and infection time $t_{e_\kappa}$. Contacts with $Y_k = 0$ for all $k$ remained uninfected.
+
+## Observation and censoring process
+
+For infected contacts, the incubation period was drawn from the probability mass function $f$ introduced in eq.2. The time of symptom onset is given by:
+
+$$ t_{\mathrm{ons}} = t_{e_\kappa} + X , \qquad X \sim f $$
+
+Contacts are assumed to be followed only while asymptomatic. Consequently, exposure history is right-censored at symptom onset. All exposures occurring at or after $(t_{\mathrm{ons}})$ were discarded, except for the infecting exposure, $e_\kappa$, which was always retained. Uninfected contacts remained under observation until the end of the study period ($t = D + 1$).
+
+Each contact was assigned to a location $\ell$ with probability $q_\ell$ ($\sum_\ell q_\ell = 1$). Conditional on location, follow-up was successful with probability $c_\ell$, drawn from a Bernoulli distribution. For contacts under follow-up, each retained exposure $e_k$ generated a follow-up visit time obtained by adding a sampled delay.
+
+$$ v_k = t_{e_k} + W_k, \qquad W_k \sim h$$
+
+where $h$ is the delay distribution from exposure to follow-up.
+
+The last symptom-free day $s$ is the latest exposure or follow-up visit recorded before the horizon $\tau$, but not earlier than the most recent retained exposure:
+$$s = \max\Big(\max\{ d \in \mathcal{E} \cup \mathcal{V} : d < \tau \}\Big)$$
+
+where $\mathcal{E} = \{t_{e_k}\}$ is the set of retained exposure dates, $\mathcal{V} = \{v_k\}$ the set of follow-up visit dates, and $\tau = \min(t_{\mathrm{ons}}, D + 1)$ for infected contacts and $\tau = D + 1$ for uninfected contacts.
+
+For each contact, the simulation returns the observed data used for scoring (the retained exposures $\mathbf{e}$ with their dates and per-exposure transmission probabilities $\pi_{e_k}$, the location $\ell$, and the last symptom-free day $s$), together with the latent ground truth (infection status and, for infected contacts, the infection time $t_{e_\kappa}$ and onset time $t_{\mathrm{ons}}$).
