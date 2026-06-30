@@ -48,7 +48,7 @@ sim <- simulate_ct(
   n_contacts = 20,
   duration = 30,
   n_exposures = 1L + rpois(1000L, 1),
-  p_inf = list(townA = 0.2, townB = 0.8),
+  p_inf = list(default = 0.2, funeral = 0.8),
   incub = 1L + rpois(1000L, 15),
   locations = list(townA = 0.7, townB = 0.3),
   coverage = list(townA = 0.8, townB = 0.5),
@@ -57,3 +57,14 @@ sim <- simulate_ct(
 
 plot(sim)
 plot(sim) + ggplot2::facet_wrap(~location, nrow = 2, scales = "free_y")
+
+
+ids <- sim |>
+  dplyr::group_by(contact_id) |>
+  dplyr::summarise(n_exposures = dplyr::n()) |>
+  dplyr::filter(n_exposures > 1) |>
+  pull(contact_id)
+
+sim |>
+  dplyr::filter(contact_id %in% ids) |>
+  head()
