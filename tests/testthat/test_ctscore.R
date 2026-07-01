@@ -83,5 +83,31 @@ test_that(
     expect_equal(res_1, res_2)
     
   }  
-  )
-  
+)
+
+
+
+test_that(
+  "ctscore() handles NA in last_visit correctly", 
+  {
+    incub <- distcrete::distcrete("gamma", interval = 1, shape = 2, scale = 2.5, w = 0)
+    
+    x_1 <- make_ctdata(
+      contact_id = c("a", "a", "b", "c", "d"), 
+      date = Sys.Date() - c(6, 4, 5, 1, 5),
+      type = c("normal", "funeral", "normal", "normal", "null"),
+      location = "some-town",
+      infection_proba = list(normal = 0.2, funeral = 0.9, null = 0),
+      last_visit = c(Sys.Date() - c(4, 2, NA, NA, NA))
+    )
+    
+    x_2 <- x_1
+    x_2$last_visit[3:5] <- as.Date("2000-12-02")
+    
+    expect_identical(
+      ctscore(x_1, incub), 
+      ctscore(x_2, incub)
+    )
+   
+  }
+)  
