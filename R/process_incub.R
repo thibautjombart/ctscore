@@ -20,7 +20,7 @@ process_incub <- function(x, max_delay = 100) {
   
   ## if x is a distcrete object, convert to a vector of probabilities
   if (inherits(x, "distcrete")) {
-    out <- x$d
+    out <- function(t) x$d(as.numeric(t))
   }
   
   ## if x is a numeric object, we turn it into a function returning the PMF
@@ -40,6 +40,7 @@ process_incub <- function(x, max_delay = 100) {
       n <- length(x) - 1L
       # t is a vector of delays
       function(t) {
+        t <- as.numeric(t)
         are_in_range <- t >= 0 & t <= n
         res <- double(length(t))
         res[are_in_range] <- x[t[are_in_range] + 1L]
