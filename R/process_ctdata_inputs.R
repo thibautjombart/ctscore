@@ -31,12 +31,16 @@ process_contact_id <- function(x) {
 #' This function checks that dates are either Date or numeric values
 #' @noRd
 #' 
-process_date <- function(x) {
+process_date <- function(x, na_ok = FALSE) {
  
   if (inherits(x, c("character", "POSIXct"))) {
     x <- as.Date(x)
   }
   stopifnot(inherits(x, c("Date", "numeric", "integer")))
+  if (!na_ok && any(is.na(x))) {
+    msg <- "Dates cannot be NA"
+    stop(msg)
+  }
   x
 }
 

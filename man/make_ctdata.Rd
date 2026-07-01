@@ -33,7 +33,8 @@ probability of infection for a given contact; defaults to a list with
 'default' exposure having a probability of infection of 0}
 
 \item{last_visit}{the date of the last visit to the contact, where they
-exhibited no symptoms; the type provided must match that of \code{date}}
+exhibited no symptoms; the type provided must match that of \code{date}; if the
+contact has not been visited yet, this should be \code{NA}}
 }
 \value{
 A \code{ctdata} object, which is a validated and ordered (by contact ID
@@ -52,7 +53,7 @@ x <- make_ctdata(
   type = c("normal", "funeral", "normal", "normal"),
   location = "some-town",
   infection_proba = list(normal = 0.2, funeral = 0.9),
-  last_visit = Sys.Date() - c(4, 4, 1, 1)
+  last_visit = Sys.Date() - c(4, 4, 1, NA)
 )
 x
 class(x)

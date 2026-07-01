@@ -24,6 +24,12 @@ test_that(
     msg <- 'inherits\\(x, c\\("Date", "numeric", "integer"\\)\\) is not TRUE'
     expect_error(process_date(NULL), msg)
     
+    msg <- "Dates cannot be NA"
+    expect_error(process_date(NA_real_), msg)
+    
+    msg <- "Dates cannot be NA"
+    expect_error(process_date(c(1, NA, 2), msg))
+    
     expect_identical(
       process_date(1:3),
       1:3
@@ -37,6 +43,10 @@ test_that(
     expect_identical(
       process_date(as.character(some_dates)),
       some_dates
+    )
+    expect_identical(
+      process_date(c(1, NA, 3), na_ok = TRUE),
+      c(1, NA, 3)
     )
     
   }
