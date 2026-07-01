@@ -9,7 +9,8 @@ make_ctdata(
   date,
   type = "default",
   location = "default",
-  infection_proba = list(default = 0)
+  infection_proba = list(default = 0),
+  last_visit
 )
 }
 \arguments{
@@ -30,10 +31,14 @@ contact; defaults to \code{default}}
 \item{infection_proba}{a \code{list} of named numeric values, each indicating the
 probability of infection for a given contact; defaults to a list with
 'default' exposure having a probability of infection of 0}
+
+\item{last_visit}{the date of the last visit to the contact, where they
+exhibited no symptoms; the type provided must match that of \code{date}}
 }
 \value{
-A \code{ctdata} object, which is a validated \code{data.frame} designed to be
-used in the \link{ctscore} function.
+A \code{ctdata} object, which is a validated and ordered (by contact ID
+and date of exposure) \code{data.frame} designed to be used in the \link{ctscore}
+function.
 }
 \description{
 This constructor will build a \code{ctdata} object from different inputs
@@ -46,7 +51,8 @@ x <- make_ctdata(
   date = Sys.Date() - c(6, 4, 2, 2),
   type = c("normal", "funeral", "normal", "normal"),
   location = "some-town",
-  infection_proba = list(normal = 0.2, funeral = 0.9)
+  infection_proba = list(normal = 0.2, funeral = 0.9),
+  last_visit = Sys.Date() - c(4, 4, 1, 1)
 )
 x
 class(x)
