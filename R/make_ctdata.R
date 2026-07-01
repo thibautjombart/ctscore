@@ -57,7 +57,7 @@ make_ctdata <- function(contact_id,
     date = process_date(date), 
     type = process_type(type), 
     location = process_location(location), 
-    last_visit = process_date(last_visit)
+    last_visit = process_date(last_visit, na_ok = TRUE)
   )
   class(out) <- c("ctdata", class(out))
   

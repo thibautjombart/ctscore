@@ -63,3 +63,33 @@ test_that(
     
   } 
 )
+
+
+
+test_that(
+  "make_ctdata() handles NA in last_visit",
+  {
+    id <- c(1, 1, 2)
+    date <- as.Date("2026-06-19") - 1:3
+    type <- c("normal", "funeral", "funeral")
+    location <- factor("town")
+    date_txt <- as.character(date)
+    res <- make_ctdata(
+      contact_id = id, 
+      date = date_txt, 
+      type = type, 
+      location = location, 
+      infection_proba = list(normal = 0.1, funeral = 0.5),
+      last_visit = c(as.Date(NA), as.Date(NA), as.Date("2026-06-19")- 1)
+    )
+    
+    expect_true(inherits(res, "ctdata"))
+    expect_true(inherits(res, "data.frame"))
+    expect_identical(res$contact_id, id)
+    expect_identical(res$date, as.Date(c("2026-06-17", "2026-06-18", "2026-06-16")))
+    expect_identical(res$type, c("funeral", "normal", "funeral"))
+    expect_identical(res$location, rep("town", 3))
+    expect_equal(res$p_infection, c(0.5, 0.1, 0.5))
+    expect_identical(res$last_visit, as.Date(c(NA, NA, "2026-06-18")))
+  }
+)
