@@ -41,7 +41,7 @@ test_that(
   "process_incub() gives identical results with numeric or distcrete input", 
   {
     incub_1 <- distcrete::distcrete("exp", rate = 2.6548, interval = 1L)
-    incub_2 <- incub$d(0:100)
+    incub_2 <- incub_1$d(0:100)
     
     res_1 <- process_incub(incub_1)
     res_2 <- process_incub(incub_2)

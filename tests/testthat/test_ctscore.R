@@ -59,5 +59,29 @@ test_that(
     expect_true(res[2] > 0)
     expect_equal(unname(res[3]), 0)
     expect_equal(unname(res[4]), 0)
+    
   }
 )
+
+
+
+test_that(
+  "ctscore gives identical results for distcrete and numeric incubation", {
+    x <- make_ctdata(
+      contact_id = c(1, 1, 2, 3, 4), 
+      date = Sys.Date() - c(6, 4, 5, 1, 5),
+      type = c("normal", "funeral", "normal", "normal", "null"),
+      location = "some-town",
+      infection_proba = list(normal = 0.2, funeral = 0.9, null = 0),
+      last_visit = Sys.Date() - c(4, 2, 1, 1, 3)
+    )
+    
+    incub <- distcrete::distcrete("gamma", interval = 1, shape = 2, scale = 2.5, w = 0)
+    incub_num <- incub$d(0:1000)
+    res_1 <- ctscore(x, incub_num)
+    res_2 <- ctscore(x, incub)
+    expect_equal(res_1, res_2)
+    
+  }  
+  )
+  
