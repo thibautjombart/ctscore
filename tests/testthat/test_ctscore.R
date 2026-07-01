@@ -98,7 +98,7 @@ test_that(
       type = c("normal", "funeral", "normal", "normal", "null"),
       location = "some-town",
       infection_proba = list(normal = 0.2, funeral = 0.9, null = 0),
-      last_visit = c(Sys.Date() - c(4, 2, NA, NA, NA))
+      last_visit = c(Sys.Date() - c(4, 4, NA, NA, NA))
     )
     
     x_2 <- x_1
