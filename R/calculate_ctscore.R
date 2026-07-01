@@ -7,7 +7,8 @@
 #' 
 #' @param p_inf a vector of probabilities of infection for different successive 
 #' exposures, ordered by increasing date
-#' @param e the date at which the individual was infected
+#' @param e the dates at which the individual was infected, having the same 
+#'   length as `p_inf`; must be sorted from the oldest to the most recent date
 #' @param s the date at which the individual was last seen and had no symptom
 #' @param t the current date
 #' @param incub the incubation time distribution, provided as a function

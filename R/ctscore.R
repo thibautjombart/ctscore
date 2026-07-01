@@ -13,6 +13,9 @@
 #'   of probabilities giving p(0 day), p(1 day), p(2 days) ... or as a 
 #'   `distcrete` object as returned by distcrete::distcrete()
 #'   
+#' @param t the current date, provided either as a `numeric` value or as a
+#'   `Date`; defaults to the current date as returned by `Sys.Date()`
+#'   
 ctscore <- function(x, incub, t = Sys.Date()) {
   ## process inputs
   
@@ -28,14 +31,15 @@ ctscore <- function(x, incub, t = Sys.Date()) {
   list_x <- split(x, x$contact_id)
   
   ## calculate the probability of infection
-  list_scores <- lapply(
+  out <- vapply(
     list_x, 
     function(e) calculate_ctscore(p_inf = e$p_infection, 
                                   e = e$date, 
-                                  s = e$last_visit, 
+                                  s = max(e$last_visit), 
                                   t = t, 
-                                  incub = incub)
-    )
+                                  incub = incub), 
+    numeric(1)
+  )
    
-  
+  out
 }
