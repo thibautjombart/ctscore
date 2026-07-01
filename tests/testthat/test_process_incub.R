@@ -34,4 +34,23 @@ test_that(
     expect_true(all(res(0) >= 0))
   }
 )
+
+
+
+test_that(
+  "process_incub() gives identical results with numeric or distcrete input", 
+  {
+    incub_1 <- distcrete::distcrete("exp", rate = 2.6548, interval = 1L)
+    incub_2 <- incub_1$d(0:100)
+    
+    res_1 <- process_incub(incub_1)
+    res_2 <- process_incub(incub_2)
+    
+    ## we test results with numerics and difftimes
+    expect_equal(res_1(0:30), res_2(0:30))
+    dates <- Sys.Date() + 0:30
+    expect_equal(res_1(Sys.Date() - dates), res_2(Sys.Date() - dates))
+    
+  }
+)
     

@@ -5,7 +5,7 @@ incub <- process_incub(w)
 
 
 test_that(
-  "calculate_p_symptoms gives expected results", 
+  "calculate_p_symptoms() gives expected results", 
   {
     
     ## single exposure
@@ -19,16 +19,18 @@ test_that(
       0
     )
     expect_equal(
-      calculate_p_symptoms(e = 0, s = 7, t = 10, incub), 
-      0
-    )
-    expect_equal(
       calculate_p_symptoms(e = 0, s = 5, t = 3, incub), 
       0
     )
     expect_equal(
       calculate_p_symptoms(e = 5, s = -1, t = 3, incub), 
       0
+    )
+    
+    ### These should be NaN because no symptom until the incubation PMF reaches 
+    ### 0 mass
+    expect_true(
+      is.nan(calculate_p_symptoms(e = 0, s = 7, t = 10, incub))
     )
     
     ### non-zero values, no followup
@@ -68,7 +70,7 @@ test_that(
 
 
 test_that(
-  "calculate_p_symptoms gives identical results with numeric or Date", 
+  "calculate_p_symptoms() gives identical results with numeric or Date", 
   {
     ref_date <- Sys.Date() - 100
     
@@ -85,6 +87,27 @@ test_that(
     expect_equal(
       calculate_p_symptoms(e = 0+ref_date, s = 5+ref_date, t = 10+ref_date, incub),
       calculate_p_symptoms(e = 0, s = 5, t = 10, incub)
+    )
+    
+  }
+)
+
+
+
+test_that(
+  "calculate_p_symptoms() handles NAs in last visit correctly", 
+  {
+    ## NAs in last visit should give the same results as if the last visit was 
+    ## prior to the exposure date
+    expect_identical(
+      calculate_p_symptoms(e = 0, s = NA, t = 3, incub),
+      calculate_p_symptoms(e = 0, s = -1, t = 3, incub)
+    )
+    
+    day <- Sys.Date()
+    expect_identical(
+      calculate_p_symptoms(e = day - 10, s = as.Date(NA), t = day - 4, incub),
+      calculate_p_symptoms(e = day - 10, s = day - 11, t = day - 4, incub)
     )
     
   }

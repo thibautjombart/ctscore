@@ -1,9 +1,10 @@
+## We generate toy data to calculate scores
+w <- c(0, 0, 1, 2, 3, 2, 0.5)
+incub <- process_incub(w)
+
 test_that(
   "calculate_ctscore gives correct results", 
   {
-    ## We generate toy data to calculate scores
-    w <- c(0, 0, 1, 2, 3, 2, 0.5)
-    incub <- process_incub(w)
     
     x <- data.frame(
       date_exposure = c(0, 2, 3),
@@ -77,6 +78,32 @@ test_that(
       sum(incub(2))/sum(incub(1:10))
       )
     expect_equal(res, sum(p_inf * p_symp))
+    
+  }
+)
+
+
+
+test_that(
+  "calculate_ctscore() works when last_visit is NA",
+  {
+    res_1 <- calculate_ctscore(
+      p_inf = c(0.1, 0.9, 0.1), 
+      e = c(0, 2, 3),
+      s = NA, 
+      t = 4, 
+      incub = incub
+    )
+    
+    res_2 <- calculate_ctscore(
+      p_inf = c(0.1, 0.9, 0.1), 
+      e = c(0, 2, 3),
+      s = -1, 
+      t = 4, 
+      incub = incub
+    )
+    
+    expect_identical(res_1, res_2)
     
   }
 )
