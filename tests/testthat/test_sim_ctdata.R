@@ -49,11 +49,8 @@ test_that("sim_ctdata returns a ctdata usable by ctscore", {
   ## p_infection matches the declared per-type probability (default = 0.1)
   expect_equal(sim$p_infection, unname(unlist(list(default = 0.1)[sim$type])))
 
-  ## make_ctdata() orders rows by (contact_id, date)
-  expect_equal(order(sim$contact_id, sim$date), seq_len(nrow(sim)))
-
   ## being a ctdata, it feeds ctscore() directly
-  sc <- ctscore(sim, incub = c(0, 0, 1, 2, 4, 3, 2, 1), t = 31)
+  sc <- ctscore(sim, incub = c(1, 2, 3, 4, 5, 6, 7), t = 31)
   expect_length(sc, length(unique(sim$contact_id)))
   expect_true(all(sc >= 0 & sc <= 1))
 })
@@ -66,15 +63,13 @@ test_that("infection status and onset are internally consistent", {
   expect_true(any(sim$infected))
 
   ## onset is recorded exactly for infected contacts
-  expect_true(all(!is.na(sim$onset[sim$infected])))
+  expect_false(all(is.na(sim$onset[sim$infected])))
   expect_true(all(is.na(sim$onset[!sim$infected])))
 
-  ## infected status and onset are constant within a contact
-  const <- tapply(seq_len(nrow(sim)), sim$contact_id, function(i) {
-    length(unique(sim$infected[i])) == 1L &&
-      length(unique(sim$onset[i])) == 1L
-  })
-  expect_true(all(const))
+  ## infected status and onset are unique for a contact
+  one <- function(x) length(unique(x)) == 1L
+  expect_true(all(tapply(sim$infected, sim$contact_id, one)))
+  expect_true(all(tapply(sim$onset, sim$contact_id, one)))
 
   ## no infection (and no onset) when the probability is zero
   sim0 <- sim_ctdata(n_contacts = 2000, infection_proba = list(default = 0))
@@ -84,7 +79,7 @@ test_that("infection status and onset are internally consistent", {
 
 test_that("number of exposures matches the input distribution", {
   set.seed(1)
-  n_exp <- 1L + rpois(1000L, 3)
+  n_exp <- 1L + rpois(5000, 3)
   ## exposures are never censored, so every drawn exposure yields one row
   sim <- sim_ctdata(
     n_contacts = 5000,

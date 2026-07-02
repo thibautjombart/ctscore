@@ -11,6 +11,8 @@
 #'
 #' @return A `ggplot` object.
 #'
+#' @importFrom rlang .data
+#'
 #' @export
 #'
 #' @examples
@@ -43,19 +45,26 @@ plot.ctdata <- function(x, ...) {
   p <- ggplot2::ggplot() +
     ggplot2::geom_segment(
       data = seg,
-      ggplot2::aes(x = x_start, xend = x_end, y = contact, yend = contact),
+      ggplot2::aes(
+        x = .data[["x_start"]], xend = .data[["x_end"]],
+        y = .data[["contact"]], yend = .data[["contact"]]
+      ),
       colour = "grey80"
     ) +
     ## exposures, coloured by type
     ggplot2::geom_point(
       data = x,
-      ggplot2::aes(x = date, y = contact, colour = type),
+      ggplot2::aes(
+        x = .data[["date"]], y = .data[["contact"]], colour = .data[["type"]]
+      ),
       size = 3
     ) +
     ## last visit (cross)
     ggplot2::geom_point(
       data = pc[!is.na(pc$last_visit), ],
-      ggplot2::aes(x = last_visit, y = contact, shape = "last visit"),
+      ggplot2::aes(
+        x = .data[["last_visit"]], y = .data[["contact"]], shape = "last visit"
+      ),
       size = 3
     )
 
@@ -64,7 +73,9 @@ plot.ctdata <- function(x, ...) {
     p <- p +
       ggplot2::geom_point(
         data = pc[!is.na(pc$onset), ],
-        ggplot2::aes(x = onset, y = contact, shape = "onset"),
+        ggplot2::aes(
+          x = .data[["onset"]], y = .data[["contact"]], shape = "onset"
+        ),
         size = 3
       )
   }
