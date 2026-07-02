@@ -11,8 +11,6 @@
 #'
 #' @return A `ggplot` object.
 #'
-#' @importFrom rlang .data
-#'
 #' @export
 #'
 #' @examples
@@ -22,6 +20,12 @@
 #'
 #' }
 plot.ctdata <- function(x, ...) {
+  if (!requireNamespace("ggplot2", quietly = TRUE)) {
+    stop("Package 'ggplot2' is required to plot ctdata objects. ",
+         "Please install it with install.packages('ggplot2').",
+         call. = FALSE)
+  }
+
   x <- as.data.frame(x)
 
   ## order contacts on the y-axis by their first exposure day
@@ -46,8 +50,8 @@ plot.ctdata <- function(x, ...) {
     ggplot2::geom_segment(
       data = seg,
       ggplot2::aes(
-        x = .data[["x_start"]], xend = .data[["x_end"]],
-        y = .data[["contact"]], yend = .data[["contact"]]
+        x = x_start, xend = x_end,
+        y = contact, yend = contact
       ),
       colour = "grey80"
     ) +
@@ -55,7 +59,7 @@ plot.ctdata <- function(x, ...) {
     ggplot2::geom_point(
       data = x,
       ggplot2::aes(
-        x = .data[["date"]], y = .data[["contact"]], colour = .data[["type"]]
+        x = date, y = contact, colour = type
       ),
       size = 3
     ) +
@@ -63,7 +67,7 @@ plot.ctdata <- function(x, ...) {
     ggplot2::geom_point(
       data = pc[!is.na(pc$last_visit), ],
       ggplot2::aes(
-        x = .data[["last_visit"]], y = .data[["contact"]], shape = "last visit"
+        x = last_visit, y = contact, shape = "last visit"
       ),
       size = 3
     )
@@ -74,7 +78,7 @@ plot.ctdata <- function(x, ...) {
       ggplot2::geom_point(
         data = pc[!is.na(pc$onset), ],
         ggplot2::aes(
-          x = .data[["onset"]], y = .data[["contact"]], shape = "onset"
+          x = onset, y = contact, shape = "onset"
         ),
         size = 3
       )
