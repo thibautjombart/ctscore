@@ -10,17 +10,53 @@
 #' 
 #' @export
 #' 
-#' @param x a `ctdata` object
-#' 
 #' @seealso [make_ctdata()] to create contact tracing data from existing data, 
 #' or [sim_ctdata()] to simulate them
 #' 
-sim_followup <- function(x, coverage = 0) {
+#' @param x a `ctdata` object
+#' 
+#' @param coverage the proportion of contacts visited at any time step; defaults 
+#'   to 0 - no follow-up
+#' 
+#' @param duration an `integer` indicating the number of days to simulate 
+#'   follow-up for; starts from the most recent date in `x`, be it in follow-up 
+#'   history or in exposures; defaults to 1 day
+#'   
+#' @param strategy a `character` indicating the follow-up strategy to use in the
+#'   simulations; currently available values are: "random"; see details section
+#'   for more information
+#'   
+#' @@details
+#' Available follow-up strategies (`strategy` argument) include:
+#' 
+#' - "random": individuals are visited at random every day of the follow-up
+#' 
+#' - "geo_random": locations are prioritised at random every day of the 
+#'  follow-up; as many contacts as possible are visited in the first chosen 
+#'  location, then if capacity remains, in the second, third, etc.
+#' 
+#' 
+sim_followup <- function(x, 
+                         duration = 1, 
+                         coverage = 0, 
+                         strategy = c("random", 
+                                      "geo_random", 
+                                      "ctscore", 
+                                      "geo_ctscore")
+                         ) {
   
-  # Check that ctdata is a valid ctdata object
+  # Check inputs
   if (!inherits(x, "ctdata")) {
     stop("x must be a ctdata object")
   }
+  stopifnot(is.numeric(duration))
+  stopifnot(is.finite(duration))
+  stopifnot(duration > 0)
+  stopifnot(is.numeric(coverage))
+  stopifnot(is.finite(coverage))
+  stopifnot(coverage >= 0)
+  stopifnot(coverage <= 1)
+  strategy <- match.arg(strategy)
   
   out <- x
   return(out)
