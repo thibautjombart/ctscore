@@ -13,19 +13,23 @@
 
 process_duration <- function(x, txt = "x", strictly_positive = FALSE) {
   if (length(x) != 1L) {
-    msg <- sptrintf("'%s' must be a single value", txt)
+    msg <- sprintf("'%s' must be a single value", txt)
     stop(msg)
   }
   if (!is.numeric(x)) {
-    msg <- sptrintf("'%s' must be numeric", txt)
+    msg <- sprintf("'%s' must be numeric", txt)
     stop(msg)
   }
   if (!is.finite(x)) {
-    msg <- sptrintf("'%s' must be finite", txt)
+    msg <- sprintf("'%s' must be finite", txt)
     stop(msg)
   }
-  if (strictly_positive && x < 0) {
-    msg <- sptrintf("'%s' must be strictly positive", txt)
+  if (x < 0) {
+    msg <- sprintf("'%s' must be positive", txt)
+    stop(msg)
+  }
+  if (strictly_positive && x <= 0) {
+    msg <- sprintf("'%s' must be strictly positive", txt)
     stop(msg)
   }
   as.integer(x)

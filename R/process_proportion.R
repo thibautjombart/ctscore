@@ -10,23 +10,23 @@
 
 process_proportion <- function(x, txt = "x") {
   if (length(x) != 1L) {
-    msg <- sptrintf("'%s' must be a single value", txt)
+    msg <- sprintf("'%s' must be a single value", txt)
     stop(msg)
   }
   if (!is.numeric(x)) {
-    msg <- sptrintf("'%s' must be numeric", txt)
+    msg <- sprintf("'%s' must be numeric", txt)
     stop(msg)
   }
   if (!is.finite(x)) {
-    msg <- sptrintf("'%s' must be finite", txt)
+    msg <- sprintf("'%s' must be finite", txt)
     stop(msg)
   }
   if (x < 0) {
-    msg <- sptrintf("'%s' must be >= 0", txt)
+    msg <- sprintf("'%s' must be >= 0", txt)
     stop(msg)
   }
   if (x > 1) {
-    msg <- sptrintf("'%s' must be <= 1", txt)
+    msg <- sprintf("'%s' must be <= 1", txt)
     stop(msg)
   }
   x
