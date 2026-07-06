@@ -37,6 +37,7 @@ library(dplyr)
 #> The following objects are masked from 'package:base':
 #> 
 #>     intersect, setdiff, setequal, union
+library(ggplot2)
 
 ## use the path to your own file in practice 
 path_to_file <- system.file("toy_ctdata.xlsx", package = "ctscore")
@@ -251,7 +252,15 @@ res
 #> # ℹ 20 more rows
 
 
-dotchart(res$score, xlab = "Contact tracing score", pch = 20)
+## some wrangling needed to keep the order of contacts in the plot
+res %>% 
+  mutate(contact_id = factor(contact_id, levels = unique(contact_id))) %>% 
+ggplot(aes(x = score, y = contact_id)) + 
+  geom_col() + 
+  theme_bw() + 
+  labs(x = "ctscore (probability of detecting symptoms)", 
+       y = "Contact ID", 
+       title = "Contact tracing scoring")
 ```
 
 <img src="man/figures/README-unnamed-chunk-8-1.png" alt="" width="100%" />

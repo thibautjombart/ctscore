@@ -39,6 +39,7 @@ library(rio)
 library(magrittr)
 library(tibble)
 library(dplyr)
+library(ggplot2)
 
 ## use the path to your own file in practice 
 path_to_file <- system.file("toy_ctdata.xlsx", package = "ctscore")
@@ -132,7 +133,15 @@ res <- left_join(
 res
 
 
-dotchart(res$score, xlab = "Contact tracing score", pch = 20)
+## some wrangling needed to keep the order of contacts in the plot
+res %>% 
+  mutate(contact_id = factor(contact_id, levels = unique(contact_id))) %>% 
+ggplot(aes(x = score, y = contact_id)) + 
+  geom_col() + 
+  theme_bw() + 
+  labs(x = "ctscore (probability of detecting symptoms)", 
+       y = "Contact ID", 
+       title = "Contact tracing scoring")
 
 ```
 
