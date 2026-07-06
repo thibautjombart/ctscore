@@ -26,15 +26,22 @@
 #'   simulations; currently available values are: "random"; see details section
 #'   for more information
 #'   
-#' @@details
+#' @details
 #' Available follow-up strategies (`strategy` argument) include:
 #' 
-#' - "random": individuals are visited at random every day of the follow-up
+#' - "random": individuals are visited at random every day of the simulation
 #' 
-#' - "geo_random": locations are prioritised at random every day of the 
-#'  follow-up; as many contacts as possible are visited in the first chosen 
+#' - "geo_random": locations are prioritized at random every day of the 
+#'  simulation; as many contacts as possible are visited in the first chosen 
 #'  location, then if capacity remains, in the second, third, etc.
-#' 
+#'  
+#' - "ctscore": individuals are prioritized by highest ctscore every day of the 
+#'   simulation
+#'   
+#' - "geo_ctscore": geographic locations are prioritized according by highest
+#'   ctscore every day of the simulation; as many contacts as possible are 
+#'   visited in the first chosen location, then if capacity remains, in the 
+#'   second, third, etc.  
 #' 
 sim_followup <- function(x, 
                          duration = 1, 
@@ -58,7 +65,8 @@ sim_followup <- function(x,
   stopifnot(coverage <= 1)
   strategy <- match.arg(strategy)
   
-  out <- x
+  f_strategy <- get(paste0("_followup_", strategy))
+  out <- f_strategy(x)
   return(out)
 }
 

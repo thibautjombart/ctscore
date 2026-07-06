@@ -36,7 +36,7 @@ onset day, \code{NA} when not infected).
 }
 \description{
 Simulate contact tracing data for a set of contacts. Each contact has one or
-more n_exposures, each with a probability of causing infection. Infected
+more exposures, each with a probability of causing infection. Infected
 contacts develop symptoms after an incubation period.
 }
 \seealso{

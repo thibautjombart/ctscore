@@ -1,11 +1,11 @@
 test_that(
   "sim_followup() issues correct errors", 
   {
+    x <- sim_ctdata(5)
     
     msg <- "x must be a ctdata object"
     expect_error(sim_followup("lkjdsf"), msg)
     
-    x <- sim_ctdata(5)
     msg <- "is.numeric\\(duration\\) is not TRUE"
     expect_error(sim_followup(x, duration = NA), msg)
     
