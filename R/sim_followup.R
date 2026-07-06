@@ -18,9 +18,17 @@
 #' @param coverage the proportion of contacts visited at any time step; defaults 
 #'   to 0 - no follow-up
 #' 
-#' @param duration an `integer` indicating the number of days to simulate 
-#'   follow-up for; starts from the most recent date in `x`, be it in follow-up 
+#' @param time an `integer` indicating the number of days to run the simulation 
+#'   for; starts from the most recent date in `x`, be it in follow-up 
 #'   history or in exposures; defaults to 1 day
+#'   
+#' @param delay an `integer` the minimum delay for follow-up to start, after the
+#'   first exposure of the concerned contact; defaults to 1 - visit can start
+#'   the day after the first exposure
+#' 
+#' @param duration an `integer` indicating the number of days after the last 
+#'   exposure a contact should be followed for; usually determined according to 
+#'   the incubation time distribution; defaults to 21 days
 #'   
 #' @param strategy a `character` indicating the follow-up strategy to use in the
 #'   simulations; currently available values are: "random"; see details section
@@ -44,7 +52,9 @@
 #'   second, third, etc.  
 #' 
 sim_followup <- function(x, 
-                         duration = 1, 
+                         time = 1, 
+                         delay = 1,
+                         duration = 21, 
                          coverage = 0, 
                          strategy = c("random", 
                                       "geo_random", 
@@ -56,17 +66,21 @@ sim_followup <- function(x,
   if (!inherits(x, "ctdata")) {
     stop("x must be a ctdata object")
   }
-  stopifnot(is.numeric(duration))
-  stopifnot(is.finite(duration))
-  stopifnot(duration > 0)
-  stopifnot(is.numeric(coverage))
-  stopifnot(is.finite(coverage))
-  stopifnot(coverage >= 0)
-  stopifnot(coverage <= 1)
-  strategy <- match.arg(strategy)
-  
+  time <- process_duration(time, "time", strictly_positive = TRUE)
+  delay <- process_duration(delay, "delay", strictly_positive = TRUE)
+  duration <- process_duration(duration, "duration", strictly_positive = TRUE)
+  coverage <- process_proportion(coverage, "coverage")
+ 
+  ## get the corresponding internal sub-routine, named _followup_<strategy>
   f_strategy <- get(paste0("_followup_", strategy))
-  out <- f_strategy(x)
+  out <- f_strategy(
+    x, 
+    time = time, 
+    delay = delay, 
+    duration = duration, 
+    coverage = coverage
+  )
+
   return(out)
 }
 

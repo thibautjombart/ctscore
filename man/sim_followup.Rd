@@ -6,7 +6,9 @@
 \usage{
 sim_followup(
   x,
-  duration = 1,
+  time = 1,
+  delay = 1,
+  duration = 21,
   coverage = 0,
   strategy = c("random", "geo_random", "ctscore", "geo_ctscore")
 )
@@ -14,9 +16,17 @@ sim_followup(
 \arguments{
 \item{x}{a \code{ctdata} object}
 
-\item{duration}{an \code{integer} indicating the number of days to simulate
-follow-up for; starts from the most recent date in \code{x}, be it in follow-up
+\item{time}{an \code{integer} indicating the number of days to run the simulation
+for; starts from the most recent date in \code{x}, be it in follow-up
 history or in exposures; defaults to 1 day}
+
+\item{delay}{an \code{integer} the minimum delay for follow-up to start, after the
+first exposure of the concerned contact; defaults to 1 - visit can start
+the day after the first exposure}
+
+\item{duration}{an \code{integer} indicating the number of days after the last
+exposure a contact should be followed for; usually determined according to
+the incubation time distribution; defaults to 21 days}
 
 \item{coverage}{the proportion of contacts visited at any time step; defaults
 to 0 - no follow-up}
