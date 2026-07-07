@@ -1,5 +1,6 @@
 ctscore: Contact Tracing Scoring System
 ================
+Thibaut Jombart
 
 <!-- README.md is generated from README.Rmd. Please edit that file. -->
 <!-- The code to render this README is stored in .github/workflows/render-readme.yaml -->
@@ -157,7 +158,7 @@ score
 #>          1         10         11         12         13         14         15 
 #> 0.19854218 0.19772316 0.20028407 0.89463558 0.90958819 0.97174690 0.19870824 
 #>         16         17         18         19          2         20         21 
-#> 0.22232470 0.19754793 0.74628901 0.10752694 0.60000140 0.01314619 0.14895995 
+#> 0.22232470 0.19754793 0.74628901 0.15502167 0.60000140 0.01314619 0.14895995 
 #>         22         23         24         25         26         27         28 
 #> 0.79589928 0.28480854 0.88870951 0.19158821 0.82388155 0.62067571 0.18872827 
 #>         29          3         30          4          5          6          7 
@@ -241,10 +242,10 @@ a long time ago.
 ``` r
 tail(res_full)
 #>    contact_id date      type   location last_visit p_infection      score
-#> 41         19    6 household    hotspot         30         0.2 0.10752694
-#> 42         19   17 household    hotspot         30         0.2 0.10752694
-#> 43         19   26 household    hotspot         30         0.2 0.10752694
-#> 44         19   30 household    hotspot         30         0.2 0.10752694
+#> 41         19    6 household    hotspot         30         0.2 0.15502167
+#> 42         19   12 household    hotspot         30         0.2 0.15502167
+#> 43         19   13 household    hotspot         30         0.2 0.15502167
+#> 44         21   27   funeral    hotspot         29         0.9 0.14895995
 #> 45         29   29   funeral local_town         NA         0.9 0.05915784
 #> 46         20   29 household    hotspot         NA         0.2 0.01314619
 ```
@@ -254,8 +255,14 @@ exposure only 2 days ago, so that it is unlikely that the individual has
 been infected, and if they have been, it is unlikely that they have
 developed symptoms yet.
 
-The second last contact (ID 19) may be counter-intuitive: indeed, they
-had multiple exposures, so we could expect they would have a high score.
-However, the only high-risk exposure (funeral) was recent (day 29), and
-they had not yet developed symptoms yesterday (last visit on day 30). If
-they are infected, it is likely they will show symptoms later.
+The second last contact (ID 29) reported a high-risk (funeral) exposure,
+but this was very recent (day 29) so they are unlikely to show symptoms
+just yet.
+
+The situation is the same for the third last contact (ID 21), whose
+funeral exposure is yet too recent to show symptoms just yet, if they
+were infected.
+
+The fourth last contact (ID 19) has reported multiple weak exposures,
+but they were last visited yesterday and showed no symptoms, so they are
+unlikely to be infected.
