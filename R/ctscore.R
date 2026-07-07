@@ -13,7 +13,7 @@
 #'   of probabilities giving p(0 day), p(1 day), p(2 days) ... or as a 
 #'   `distcrete` object as returned by distcrete::distcrete()
 #'   
-#' @param t the current date, provided either as a `numeric` value or as a
+#' @param current_date the current date, provided either as a `numeric` value or as a
 #'   `Date`; defaults to the current date as returned by `Sys.Date()`
 #' 
 #' @return A named numeric vector giving the probability of detecting symptoms
@@ -43,7 +43,7 @@
 #' res <- ctscore(x, incub)
 #' res
 
-ctscore <- function(x, incub, t = Sys.Date()) {
+ctscore <- function(x, incub, current_date = Sys.Date()) {
   ## process inputs
   
    if (!inherits(x, "ctdata")) {
@@ -63,7 +63,7 @@ ctscore <- function(x, incub, t = Sys.Date()) {
     function(e) calculate_ctscore(p_inf = e$p_infection, 
                                   e = e$date, 
                                   s = max(e$last_visit), 
-                                  t = t, 
+                                  t = current_date, 
                                   incub = incub), 
     numeric(1)
   )
