@@ -20,12 +20,23 @@
 #'   simulation truth `infected` (logical, per contact) and `onset` (symptom
 #'   onset day, `NA` when not infected).
 #'
-#' @seealso [make_ctdata()], which builds the `ctdata` core, and [ctscore()].
+#' @seealso [make_ctdata()] to create a `ctdata` object from real data.
 
 #' @importFrom stats rbinom rgamma rpois runif
 #'
 #' @export
 #'
+#' @examples
+#' x <- sim_ctdata(
+#'  n_contacts = 10,
+#' duration = 30,
+#' incub = 1:7,
+#' locations = list(cityA = 0.8, cityB = 0.2),
+#' n_exposures = list(cityA = 2, cityB = 1 + rpois(n = 10, lambda = 5)),
+#' infection_proba = list(household = 0.2, funeral = 0.4),
+#' type_weights = list(household = 0.7, funeral = 0.3)
+#' )
+#' head(x)
 #'
 
 sim_ctdata <- function(

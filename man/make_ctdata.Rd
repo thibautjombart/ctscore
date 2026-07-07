@@ -48,7 +48,7 @@ describing past exposures and follow-up history for different individuals.
 \examples{
 
 x <- make_ctdata(
-  contact_id = c(1, 1, 2, 3), 
+  contact_id = c(1, 1, 2, 3),
   date = Sys.Date() - c(6, 4, 2, 2),
   type = c("normal", "funeral", "normal", "normal"),
   location = "some-town",
@@ -57,6 +57,9 @@ x <- make_ctdata(
 )
 x
 class(x)
+}
+\seealso{
+\code{\link[=sim_ctdata]{sim_ctdata()}} to simulate contact tracing data.
 }
 \author{
 Thibaut Jombart
