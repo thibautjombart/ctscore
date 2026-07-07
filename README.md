@@ -1,6 +1,5 @@
 ctscore: Contact Tracing Scoring System
 ================
-Thibaut Jombart
 
 <!-- README.md is generated from README.Rmd. Please edit that file. -->
 <!-- The code to render this README is stored in .github/workflows/render-readme.yaml -->
