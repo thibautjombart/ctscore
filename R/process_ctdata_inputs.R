@@ -18,11 +18,7 @@ NULL
 #' @noRd
 #' 
 process_contact_id <- function(x) {
-  if (is.factor(x)) {
-    x <- as.character(x)
-  }
-  stopifnot(inherits(x, c("character", "numeric", "integer")))
-  x
+  as.character(x)
 }
 
 

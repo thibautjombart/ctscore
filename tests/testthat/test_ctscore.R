@@ -111,3 +111,35 @@ test_that(
    
   }
 )  
+
+
+
+test_that(
+  "ctscore() shapes results correctly", 
+  {
+    x <- make_ctdata(
+      contact_id = c(1, 1, 2, 3, 4), 
+      date = Sys.Date() - c(6, 4, 5, 1, 5),
+      type = c("normal", "funeral", "normal", "normal", "null"),
+      location = "some-town",
+      infection_proba = list(normal = 0.2, funeral = 0.9, null = 0),
+      last_visit = Sys.Date() - c(4, 2, 1, 1, 3)
+    )
+    
+    incub <- distcrete::distcrete(
+      "gamma", interval = 1, shape = 3.123, scale = 2.5, w = 0
+    )
+    
+    res_1 <- ctscore(x, incub)
+    res_2 <- ctscore(x, incub, out_type = "data.frame")
+    res_3 <- ctscore(x, incub, out_type = "ctdata")
+    
+    expect_true(is.numeric(res_1))
+    expect_true(is.data.frame(res_2))
+    expect_true(inherits(res_3, "ctdata"))
+    
+    expect_equal(unname(res_1), res_2$score)
+    expect_equal(unname(res_1), res_3$score[-2])
+    expect_equal(nrow(x), nrow(res_3))
+  }
+)

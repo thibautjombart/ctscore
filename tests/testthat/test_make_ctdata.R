@@ -54,7 +54,7 @@ test_that(
     
     expect_true(inherits(res, "ctdata"))
     expect_true(inherits(res, "data.frame"))
-    expect_identical(res$contact_id, id)
+    expect_identical(res$contact_id, as.character(id))
     expect_identical(res$date, as.Date(c("2026-06-17", "2026-06-18", "2026-06-16")))
     expect_identical(res$type, c("funeral", "normal", "funeral"))
     expect_identical(res$location, rep("town", 3))
@@ -85,7 +85,7 @@ test_that(
     
     expect_true(inherits(res, "ctdata"))
     expect_true(inherits(res, "data.frame"))
-    expect_identical(res$contact_id, id)
+    expect_identical(res$contact_id, as.character(id))
     expect_identical(res$date, as.Date(c("2026-06-17", "2026-06-18", "2026-06-16")))
     expect_identical(res$type, c("funeral", "normal", "funeral"))
     expect_identical(res$location, rep("town", 3))

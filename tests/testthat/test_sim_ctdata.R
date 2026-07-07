@@ -50,7 +50,7 @@ test_that("sim_ctdata returns a ctdata usable by ctscore", {
   expect_equal(sim$p_infection, unname(unlist(list(default = 0.1)[sim$type])))
 
   ## being a ctdata, it feeds ctscore() directly
-  sc <- ctscore(sim, incub = c(1, 2, 3, 4, 5, 6, 7), t = 31)
+  sc <- ctscore(sim, incub = c(1, 2, 3, 4, 5, 6, 7), current_date = 31)
   expect_length(sc, length(unique(sim$contact_id)))
   expect_true(all(sc >= 0 & sc <= 1))
 })

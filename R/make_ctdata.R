@@ -8,7 +8,7 @@
 #' @export
 #'
 #' @param contact_id a `character` or a `numeric` vector indicating identifiers
-#'   for the contacts
+#'   for the contacts; will be converted to `character` if not already
 #'
 #' @param date a `Date`, `numeric`, or `character` vector indicating dates of
 #'   exposures; `character` will be converted to `Date` using `as.Date`, with
@@ -55,7 +55,7 @@ make_ctdata <- function(contact_id,
                         ) {
   out <- data.frame(
     contact_id = process_contact_id(contact_id), 
-    date = process_date(date), 
+    date = process_date(date),
     type = process_type(type), 
     location = process_location(location), 
     last_visit = process_date(last_visit, na_ok = TRUE)

@@ -13,8 +13,13 @@
 #'   of probabilities giving p(0 day), p(1 day), p(2 days) ... or as a 
 #'   `distcrete` object as returned by distcrete::distcrete()
 #'   
-#' @param t the current date, provided either as a `numeric` value or as a
-#'   `Date`; defaults to the current date as returned by `Sys.Date()`
+#' @param current_date the current date, provided either as a `numeric` value or
+#'   as a `Date`; defaults to the current date as returned by `Sys.Date()`
+#'   
+#' @param out_type a `character` indicating the type of output to return; can be 
+#'   either "vector" (default) to return a named vector of scores, "data.frame" 
+#'   to return a data frame with contact IDs and scores, or "ctdata" to return a
+#'   `ctdata` object with an additional column for the scores.
 #' 
 #' @return A named numeric vector giving the probability of detecting symptoms
 #'  for each contact, with names corresponding to the contact IDs.
@@ -42,8 +47,21 @@
 #' incub <- distcrete::distcrete("gamma", interval = 1, shape = 2, scale = 2.5, w = 0)
 #' res <- ctscore(x, incub)
 #' res
+#' 
+#' ## trying other output shapes
+#' ### data.frame with individual data
+#' res_df <- ctscore(x, incub, out_type = "data.frame")
+#' res_df
+#' 
+#' ### ctdata object with scores appended
+#' res_ctdata <- ctscore(x, incub, out_type = "ctdata")
+#' res_ctdata
+#' 
 
-ctscore <- function(x, incub, t = Sys.Date()) {
+ctscore <- function(x, 
+                    incub, 
+                    current_date = Sys.Date(), 
+                    out_type = c("vector", "data.frame", "ctdata")) {
   ## process inputs
   
    if (!inherits(x, "ctdata")) {
@@ -52,7 +70,7 @@ ctscore <- function(x, incub, t = Sys.Date()) {
   }
  
   incub <- process_incub(incub)
- 
+  out_type <- match.arg(out_type)
   
   ## split the data.frame by contact ID and calculate the score for each contact
   list_x <- split(x, x$contact_id)
@@ -63,10 +81,21 @@ ctscore <- function(x, incub, t = Sys.Date()) {
     function(e) calculate_ctscore(p_inf = e$p_infection, 
                                   e = e$date, 
                                   s = max(e$last_visit), 
-                                  t = t, 
+                                  t = current_date, 
                                   incub = incub), 
     numeric(1)
   )
-   
+  
+  ## shape result into desired output type
+  if (out_type == "data.frame") {
+    out <- data.frame(contact_id = names(out), score = out)
+  } 
+  
+  if (out_type == "ctdata") {
+    out <- dplyr::left_join(x, 
+                            data.frame(contact_id = names(out),
+                                       score = out), 
+                            by = "contact_id")
+  }
   out
 }

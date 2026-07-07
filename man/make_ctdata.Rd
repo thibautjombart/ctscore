@@ -15,7 +15,7 @@ make_ctdata(
 }
 \arguments{
 \item{contact_id}{a \code{character} or a \code{numeric} vector indicating identifiers
-for the contacts}
+for the contacts; will be converted to \code{character} if not already}
 
 \item{date}{a \code{Date}, \code{numeric}, or \code{character} vector indicating dates of
 exposures; \code{character} will be converted to \code{Date} using \code{as.Date}, with

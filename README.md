@@ -106,11 +106,11 @@ x <- make_ctdata(
 head(x)
 #>   contact_id date      type   location last_visit p_infection
 #> 1          1    5 household   new_city         13         0.2
-#> 2          2   13   funeral   new_city         27         0.9
-#> 3          3    6 household local_town         NA         0.2
-#> 4          4    5 household   new_city         NA         0.2
-#> 5          5   17   funeral    hotspot         22         0.9
-#> 6          5   18 household    hotspot         22         0.2
+#> 2         10   10 household local_town         NA         0.2
+#> 3         11    2 household   new_city         NA         0.2
+#> 4         12    7   funeral    hotspot          9         0.9
+#> 5         13    9   funeral local_town          9         0.9
+#> 6         13   15 household local_town          9         0.2
 class(x)
 #> [1] "ctdata"     "data.frame"
 ```
@@ -152,33 +152,72 @@ current date is day 31 (again, this could be a real date in practice, in
 YYYY-MM-DD format):
 
 ``` r
-score <- ctscore(x, incub, t = 31)
+score <- ctscore(x, incub, current_date = 31)
 score
-#>          1          2          3          4          5          6          7 
-#> 0.19854218 0.60000140 0.19969489 0.19991568 0.79604599 0.84927722 0.19844927 
-#>          8          9         10         11         12         13         14 
-#> 0.83344774 0.19871356 0.19772316 0.20028407 0.89463558 0.90958819 0.97174690 
-#>         15         16         17         18         19         20         21 
-#> 0.19870824 0.22232470 0.19754793 0.74628901 0.10752694 0.01314619 0.14895995 
+#>          1         10         11         12         13         14         15 
+#> 0.19854218 0.19772316 0.20028407 0.89463558 0.90958819 0.97174690 0.19870824 
+#>         16         17         18         19          2         20         21 
+#> 0.22232470 0.19754793 0.74628901 0.10752694 0.60000140 0.01314619 0.14895995 
 #>         22         23         24         25         26         27         28 
 #> 0.79589928 0.28480854 0.88870951 0.19158821 0.82388155 0.62067571 0.18872827 
-#>         29         30 
-#> 0.05915784 0.89728078
+#>         29          3         30          4          5          6          7 
+#> 0.05915784 0.19969489 0.89728078 0.19991568 0.79604599 0.84927722 0.19844927 
+#>          8          9 
+#> 0.83344774 0.19871356
 ```
 
 `score` indicates, for each contact, the probability that a visit today
-will lead to detecting a new case. For convenience, we can append this
-score to the contact tracing database, and reorder contacts by
-decreasing order of priority/score:
+will lead to detecting a new case.
+
+For convenience, we can ask `ctscore` to return results in two different
+shapes:
+
+- as a `data.frame` with contact IDs and scores, which is simpler to
+  handle to prioritise individuals
+- as a `ctdata` object with an additional column for the scores appended
+  to the exposure database
 
 ``` r
-## adding scores to the original exposures table
-res_full <- left_join(x, 
-                      tibble(contact_id = as.integer(names(score)),
-                             score = score), 
-                      by = "contact_id") %>% 
+## data.frame of individual scores, sorted by score
+res <- ctscore(x, incub, current_date = 31, out_type = "data.frame") %>% 
+    arrange(desc(score))
+res
+#>    contact_id      score
+#> 14         14 0.97174690
+#> 13         13 0.90958819
+#> 30         30 0.89728078
+#> 12         12 0.89463558
+#> 24         24 0.88870951
+#> 6           6 0.84927722
+#> 8           8 0.83344774
+#> 26         26 0.82388155
+#> 5           5 0.79604599
+#> 22         22 0.79589928
+#> 18         18 0.74628901
+#> 27         27 0.62067571
+#> 2           2 0.60000140
+#> 23         23 0.28480854
+#> 16         16 0.22232470
+#> 11         11 0.20028407
+#> 4           4 0.19991568
+#> 3           3 0.19969489
+#> 9           9 0.19871356
+#> 15         15 0.19870824
+#> 1           1 0.19854218
+#> 7           7 0.19844927
+#> 10         10 0.19772316
+#> 17         17 0.19754793
+#> 25         25 0.19158821
+#> 28         28 0.18872827
+#> 21         21 0.14895995
+#> 19         19 0.10752694
+#> 29         29 0.05915784
+#> 20         20 0.01314619
+
+## ctdata object with scores appended, sorted by score
+res_ctdata <- ctscore(x, incub, current_date = 31, out_type = "ctdata") %>% 
   arrange(desc(score))
-res_full
+res_ctdata
 #>    contact_id date      type   location last_visit p_infection      score
 #> 1          14    1 household    hotspot         15         0.2 0.97174690
 #> 2          14   11   funeral    hotspot         15         0.9 0.97174690
@@ -226,31 +265,6 @@ res_full
 #> 44         19   30 household    hotspot         30         0.2 0.10752694
 #> 45         29   29   funeral local_town         NA         0.9 0.05915784
 #> 46         20   29 household    hotspot         NA         0.2 0.01314619
-
-## same but keeping only contact information (no exposures), simpler to
-## handle to prioritise individuals
-res <- left_join(
-  tibble(contact_id = unique(res_full$contact_id)), 
-  tibble(contact_id = as.integer(names(score)), score = score)
-  ) %>% 
-    arrange(desc(score))
-#> Joining with `by = join_by(contact_id)`
-res
-#> # A tibble: 30 × 2
-#>    contact_id score
-#>         <dbl> <dbl>
-#>  1         14 0.972
-#>  2         13 0.910
-#>  3         30 0.897
-#>  4         12 0.895
-#>  5         24 0.889
-#>  6          6 0.849
-#>  7          8 0.833
-#>  8         26 0.824
-#>  9          5 0.796
-#> 10         22 0.796
-#> # ℹ 20 more rows
-
 
 ## some wrangling needed to keep the order of contacts in the plot
 res %>% 

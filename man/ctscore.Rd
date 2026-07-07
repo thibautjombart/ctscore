@@ -4,7 +4,12 @@
 \alias{ctscore}
 \title{Calculate contact tracing score}
 \usage{
-ctscore(x, incub, t = Sys.Date())
+ctscore(
+  x,
+  incub,
+  current_date = Sys.Date(),
+  out_type = c("vector", "data.frame", "ctdata")
+)
 }
 \arguments{
 \item{x}{a \code{ctdata} object as returned by \code{\link[=make_ctdata]{make_ctdata()}}}
@@ -13,8 +18,13 @@ ctscore(x, incub, t = Sys.Date())
 of probabilities giving p(0 day), p(1 day), p(2 days) ... or as a
 \code{distcrete} object as returned by distcrete::distcrete()}
 
-\item{t}{the current date, provided either as a \code{numeric} value or as a
-\code{Date}; defaults to the current date as returned by \code{Sys.Date()}}
+\item{current_date}{the current date, provided either as a \code{numeric} value or
+as a \code{Date}; defaults to the current date as returned by \code{Sys.Date()}}
+
+\item{out_type}{a \code{character} indicating the type of output to return; can be
+either "vector" (default) to return a named vector of scores, "data.frame"
+to return a data frame with contact IDs and scores, or "ctdata" to return a
+\code{ctdata} object with an additional column for the scores.}
 }
 \value{
 A named numeric vector giving the probability of detecting symptoms
@@ -48,6 +58,16 @@ res
 incub <- distcrete::distcrete("gamma", interval = 1, shape = 2, scale = 2.5, w = 0)
 res <- ctscore(x, incub)
 res
+
+## trying other output shapes
+### data.frame with individual data
+res_df <- ctscore(x, incub, out_type = "data.frame")
+res_df
+
+### ctdata object with scores appended
+res_ctdata <- ctscore(x, incub, out_type = "ctdata")
+res_ctdata
+
 }
 \author{
 Thibaut Jombart
