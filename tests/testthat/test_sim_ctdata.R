@@ -123,3 +123,36 @@ test_that("contacts are split across locations as specified", {
     expect_proportion(sim$location == loc, shares[[loc]])
   }
 })
+
+test_that("type_weights are matched to infection_proba by name, not position", {
+  ## weights given in reverse order with 'b' zeroed -> 'b' can never be drawn
+  sim <- sim_ctdata(
+    n_contacts = 200,
+    infection_proba = list(a = 0.5, b = 0.5),
+    type_weights = list(b = 0, a = 1)
+  )
+  expect_true(all(sim$type == "a"))
+})
+
+test_that("sim_ctdata rejects invalid inputs", {
+  ## lists must be fully named
+  expect_error(sim_ctdata(infection_proba = list(0.1, b = 0.2)), "named lists")
+  ## names must agree within each keyed pair
+  expect_error(
+    sim_ctdata(locations = list(A = 1), n_exposures = list(A = 1, B = 1)),
+    "same names"
+  )
+  expect_error(
+    sim_ctdata(
+      infection_proba = list(a = 0.1, b = 0.2),
+      type_weights = list(a = 1, c = 1)
+    ),
+    "same names"
+  )
+  ## values must be in range
+  expect_error(sim_ctdata(infection_proba = list(default = 1.5)), "\\[0, 1\\]")
+  expect_error(
+    sim_ctdata(duration = 10, n_exposures = list(default = 20)),
+    "between 1 and"
+  )
+})
