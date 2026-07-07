@@ -133,13 +133,30 @@ test_that(
     res_1 <- ctscore(x, incub)
     res_2 <- ctscore(x, incub, out_type = "data.frame")
     res_3 <- ctscore(x, incub, out_type = "ctdata")
+    res_4 <- ctscore(x, incub, out_type = "ctdata_full")
     
     expect_true(is.numeric(res_1))
     expect_true(is.data.frame(res_2))
     expect_true(inherits(res_3, "ctdata"))
+    expect_true(inherits(res_4, "ctdata"))
     
     expect_equal(unname(res_1), res_2$score)
-    expect_equal(unname(res_1), res_3$score[-2])
-    expect_equal(nrow(x), nrow(res_3))
+    expect_equal(unname(res_1), res_3$score)
+    expect_equal(unname(res_1), res_4$score[-2])
+    expect_equal(nrow(x), nrow(res_4))
+    
+    expect_identical(
+      names(res_2) , 
+      c("contact_id", "score")
+    )
+    expect_identical(
+      names(res_3) , 
+      c("contact_id", "location", "last_visit", "score")
+    )
+    expect_identical(
+      names(res_4) , 
+      c(names(x), "score")
+    )
+    
   }
 )

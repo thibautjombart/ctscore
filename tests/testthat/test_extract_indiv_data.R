@@ -32,7 +32,7 @@ test_that(
   scores <- ctscore(x, 
                     incub = c(0, 0, 1, 2, 4, 3, 2, 1), 
                     current_date = Sys.Date(), 
-                    out_type = "ctdata"
+                    out_type = "ctdata_full"
                     )
   res <- extract_indiv_data(scores)
   expect_equal(nrow(res), length(unique(scores$contact_id)))
