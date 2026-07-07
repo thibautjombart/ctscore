@@ -108,30 +108,29 @@ plot(
 We can now calculate the `ctscore` using the `ctscore()` function, the current date is day 31 (again, this could be a real date in practice, in YYYY-MM-DD format):
 
 ```{r}
-score <- ctscore(x, incub, t = 31)
+score <- ctscore(x, incub, current_date = 31)
 score
 ```
 
-`score` indicates, for each contact, the probability that a visit today will lead to detecting a new case. For convenience, we can append this score to the contact tracing database, and reorder contacts by decreasing order of priority/score:
+`score` indicates, for each contact, the probability that a visit today will
+lead to detecting a new case. 
+
+For convenience, we can ask `ctscore ` to return results in two different shapes:
+
+- as a `data.frame` with contact IDs and scores, which is simpler to handle to prioritise individuals
+- as a `ctdata` object with an additional column for the scores appended to the 
+exposure database
 
 ```{r}
-## adding scores to the original exposures table
-res_full <- left_join(x, 
-                      tibble(contact_id = as.integer(names(score)),
-                             score = score), 
-                      by = "contact_id") %>% 
-  arrange(desc(score))
-res_full
-
-## same but keeping only contact information (no exposures), simpler to
-## handle to prioritise individuals
-res <- left_join(
-  tibble(contact_id = unique(res_full$contact_id)), 
-  tibble(contact_id = as.integer(names(score)), score = score)
-  ) %>% 
+## data.frame of individual scores, sorted by score
+res <- ctscore(x, incub, current_date = 31, out_type = "data.frame") %>% 
     arrange(desc(score))
 res
 
+## ctdata object with scores appended, sorted by score
+res_ctdata <- ctscore(x, incub, current_date = 31, out_type = "ctdata") %>% 
+  arrange(desc(score))
+res_ctdata
 
 ## some wrangling needed to keep the order of contacts in the plot
 res %>% 
