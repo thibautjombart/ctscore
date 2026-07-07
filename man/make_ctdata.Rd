@@ -58,6 +58,9 @@ x <- make_ctdata(
 x
 class(x)
 }
+\seealso{
+\code{\link[=sim_ctdata]{sim_ctdata()}} to simulate contact tracing data.
+}
 \author{
 Thibaut Jombart
 }

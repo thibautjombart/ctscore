@@ -7,6 +7,11 @@ Authors@R: c(
       "Thibaut", "Jombart",
       email = "thibautjombart@gmail.com",
       role = c("aut", "cre")
+    ),
+    person(
+      "Cyril", "Geismar",
+      email = "c.geismar21@imperial.ac.uk",
+      role = "aut"
     )
   )
 Description: Set of tools for calculating Jombart et al's contact tracing index.

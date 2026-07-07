@@ -8,9 +8,10 @@ sim_ctdata(
   n_contacts = 100,
   duration = 30,
   incub = 1:7,
+  locations = list(default = 1),
   n_exposures = list(default = 1),
   infection_proba = list(default = 0.1),
-  locations = list(default = 1)
+  type_weights = NULL
 )
 }
 \arguments{
@@ -18,14 +19,18 @@ sim_ctdata(
 
 \item{duration}{Length of the exposure period (days).}
 
-\item{incub}{Integer vector of incubation periods (days), sampled with
-replacement.}
+\item{incub}{Integer vector of incubation periods (days), sampled with replacement.}
 
-\item{n_exposures}{Named list giving the number of exposures per contact for each location.}
+\item{locations}{Named list giving the probability of each location being assigned to a contact.
+Names must match \code{n_exposures}.}
 
-\item{infection_proba}{Named list giving the probability of infection for each exposure type.}
+\item{n_exposures}{Named list giving the number of exposures per contact for each location.
+Names must match \code{locations}.}
 
-\item{locations}{Named list giving the probability of each location being sampled for a contact.}
+\item{infection_proba}{Named list giving the probability of infection for each exposure type.
+Names must match \code{type_weights}.}
+
+\item{type_weights}{Named list giving the relative frequency of each exposure type. Names must match \code{infection_proba}. Defaults to uniform.}
 }
 \value{
 An object of class \code{c("sim_ctdata", "ctdata", "data.frame")} with one
@@ -35,12 +40,25 @@ simulation truth \code{infected} (logical, per contact) and \code{onset} (sympto
 onset day, \code{NA} when not infected).
 }
 \description{
-Simulate contact tracing data for a set of contacts. Each contact has one or
+Simulate contact tracing data for a set of contacts. A contact has one or
 more exposures, each with a probability of causing infection. Infected
 contacts develop symptoms after an incubation period.
 }
+\examples{
+x <- sim_ctdata(
+ n_contacts = 10,
+duration = 30,
+incub = 1:7,
+locations = list(cityA = 0.8, cityB = 0.2),
+n_exposures = list(cityA = 2, cityB = c(2,2,3,4,5,10)),
+infection_proba = list(household = 0.2, funeral = 0.4),
+type_weights = list(household = 0.7, funeral = 0.3)
+)
+head(x)
+class(x)
+}
 \seealso{
-\code{\link[=make_ctdata]{make_ctdata()}}, which builds the \code{ctdata} core, and \code{\link[=ctscore]{ctscore()}}.
+\code{\link[=make_ctdata]{make_ctdata()}} to create a \code{ctdata} object from real data.
 }
 \author{
 Cyril Geismar
