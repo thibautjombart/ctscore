@@ -8,7 +8,7 @@ ctscore(
   x,
   incub,
   current_date = Sys.Date(),
-  out_type = c("vector", "data.frame", "ctdata")
+  out_type = c("vector", "data.frame", "ctdata", "ctdata_full")
 )
 }
 \arguments{
@@ -23,8 +23,9 @@ as a \code{Date}; defaults to the current date as returned by \code{Sys.Date()}}
 
 \item{out_type}{a \code{character} indicating the type of output to return; can be
 either "vector" (default) to return a named vector of scores, "data.frame"
-to return a data frame with contact IDs and scores, or "ctdata" to return a
-\code{ctdata} object with an additional column for the scores.}
+to return a data frame with contact IDs and scores, "ctdata" to return a
+\code{ctdata} object with individual data and scores, or "ctdata_full" to append
+scores to the original \code{ctdata} of exposure data}
 }
 \value{
 A named numeric vector giving the probability of detecting symptoms
@@ -54,6 +55,11 @@ incub <- c(0, 0, 1, 2, 4, 3, 2, 1)
 res <- ctscore(x, incub)
 res
 
+## other useful shape for results: a ctdata object of individuals data with 
+## scores appended
+res <- ctscore(x, incub, out_type = "ctdata")
+res
+
 ## other example using `distcrete` to build the incubation time distribution
 incub <- distcrete::distcrete("gamma", interval = 1, shape = 2, scale = 2.5, w = 0)
 res <- ctscore(x, incub)
@@ -64,10 +70,14 @@ res
 res_df <- ctscore(x, incub, out_type = "data.frame")
 res_df
 
-### ctdata object with scores appended
+### ctdata object of individuals with scores appended
 res_ctdata <- ctscore(x, incub, out_type = "ctdata")
 res_ctdata
 
+
+### same, with all original exposure data
+res_ctdata_full <- ctscore(x, incub, out_type = "ctdata_full")
+res_ctdata_full
 }
 \author{
 Thibaut Jombart

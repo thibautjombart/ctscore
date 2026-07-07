@@ -115,22 +115,32 @@ score
 `score` indicates, for each contact, the probability that a visit today will
 lead to detecting a new case. 
 
-For convenience, we can ask `ctscore ` to return results in two different shapes:
+For convenience, we can ask `ctscore ` to return results in other formats through the argument `out_type`:
 
-- as a `data.frame` with contact IDs and scores, which is simpler to handle to prioritise individuals
-- as a `ctdata` object with an additional column for the scores appended to the 
-exposure database
+- "ctdata": returns a `ctdata` object with only individual data and scores 
+(stripping exposures); this is the most useful for prioritising individuals for 
+visits
+
+- "data.frame": returns a `data.frame` with contact IDs and scores
+
+- "ctdata_full": a `ctdata` object with an additional column for the scores 
+appended to the exposure database
 
 ```{r}
-## data.frame of individual scores, sorted by score
-res <- ctscore(x, incub, current_date = 31, out_type = "data.frame") %>% 
+## `ctdata` with individual info and  scores, sorted by score
+res <- ctscore(x, incub, current_date = 31, out_type = "ctdata") %>% 
     arrange(desc(score))
-res
+head(res)
 
 ## ctdata object with scores appended, sorted by score
-res_ctdata <- ctscore(x, incub, current_date = 31, out_type = "ctdata") %>% 
+res_full <- ctscore(x, incub, current_date = 31, out_type = "ctdata_full") %>% 
   arrange(desc(score))
-res_ctdata
+
+```
+
+We can use a simple plot to visualise the scores for each contact, which can be useful for prioritising visits:
+
+```{r}
 
 ## some wrangling needed to keep the order of contacts in the plot
 res %>% 
@@ -141,7 +151,33 @@ ggplot(aes(x = score, y = contact_id)) +
   labs(x = "ctscore (probability of detecting symptoms)", 
        y = "Contact ID", 
        title = "Contact tracing scoring")
-
 ```
 
 
+We can look at the first and last scores to understand how the scoring system works. 
+
+```{r}
+head(res_full)
+```
+
+The first contact (ID 14) has the highest score because they had multiple 
+exposures, including several funeral exposures, and were last seen 16 days ago 
+(on day 15, current day is 31), so there was ample time for symptoms to have appeared since then. The second contact (ID 13) has a high score for the same reasons: multiple exposures, and a last visit a long time ago.
+
+
+```{r}
+tail(res_full)
+```
+
+The very last contact (ID 20) has a low score because of a single 'weak' 
+exposure only 2 days ago, so that it is unlikely that the individual has been infected, and if they have been, it is unlikely that they have developed 
+symptoms yet. 
+
+The second last contact (ID 29) reported a high-risk (funeral) exposure, but 
+this was very recent (day 29) so they are unlikely to show symptoms just yet.
+
+The situation is the same for the third last contact (ID 21), whose funeral 
+exposure is yet too recent to show symptoms just yet, if they were infected. 
+
+The fourth last contact (ID 19) has reported multiple weak exposures, but they 
+were last visited yesterday and showed no symptoms, so they are unlikely to be infected.
