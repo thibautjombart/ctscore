@@ -79,7 +79,7 @@ sim_ctdata <- function(n_contacts = 100,
     }
   }
   
-  ## Numeric ranges: guard against silent misuse and cryptic downstream errors.
+  ## Check that numeric inputs are valid
   if (!is.numeric(n_contacts) ||
       length(n_contacts) != 1L ||
       n_contacts < 1 ||
@@ -100,9 +100,8 @@ sim_ctdata <- function(n_contacts = 100,
     stop("`n_exposures` values must be integers between 1 and `duration`")
   }
   
-  ## sample(x, n) is unsafe: for a length-1 x it draws from seq_len(x), not x.
-  ## So sample positions and index x — a length-1 x then returns x itself.
-  
+  ## sample() behaves differently when x is a vector of length 1 vs >1.
+  ## Sample indices instead, then subset x.
   resample <- function(x, n)
     x[sample.int(length(x), n, replace = TRUE)]
   
@@ -125,7 +124,7 @@ sim_ctdata <- function(n_contacts = 100,
                    })
     pi_e <- calculate_p_infection(unlist(infection_proba[type]))
     
-    # which exposure caused the infection, if any (NA = never infected)
+    ## Sample the exposure responsible for infection (NA = not infected)
     k_inf <- sample(c(seq_along(pi_e), NA), 1, prob = c(pi_e, 1 - sum(pi_e)))
     infected <- !is.na(k_inf)
     
@@ -157,8 +156,8 @@ sim_ctdata <- function(n_contacts = 100,
     last_visit = ct$last_visit
   )
   
-  ## Re-attach the latent truth dropped by make_ctdata().
-  # `infected` and `onset` are constant within a contact, so they are matched back on contact_id.
+  ## Re-attach simulation truth removed by make_ctdata().
+  ## Infection status and onset are constant per contact, so match using contact_id.
   truth <- ct[!duplicated(ct$contact_id), c("contact_id", "infected", "onset")]
   i <- match(out$contact_id, truth$contact_id)
   out$infected <- truth$infected[i]
