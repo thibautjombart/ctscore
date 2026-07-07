@@ -3,6 +3,7 @@
 S3method(plot,ctdata)
 export(add_infection_proba)
 export(ctscore)
+export(extract_indiv_data)
 export(make_ctdata)
 export(sim_ctdata)
 export(sim_followup)
