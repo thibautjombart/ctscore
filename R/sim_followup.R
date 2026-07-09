@@ -15,7 +15,7 @@
 #' 
 #' @param x a `ctdata` object
 #' 
-#' @param coverage the proportion of contacts visited at any time step; defaults 
+#' @param coverage the expected proportion of contacts visited at any time step; defaults 
 #'   to 0 - no follow-up
 #' 
 #' @param time an `integer` indicating the number of days to run the simulation 
@@ -33,6 +33,8 @@
 #' @param strategy a `character` indicating the follow-up strategy to use in the
 #'   simulations; currently available values are: "random"; see details section
 #'   for more information
+#' 
+#' @return `x` with columns `last_visit`, `detected` and `detection_date` updated according to the follow-up strategy.
 #'   
 #' @details
 #' Available follow-up strategies (`strategy` argument) include:
