@@ -32,6 +32,8 @@
 #' @return A `ctdata` object, which is a validated and ordered (by contact ID
 #'   and date of exposure) `data.frame` designed to be used in the [ctscore] 
 #'   function.
+#' 
+#' @seealso [sim_ctdata()] to simulate contact tracing data.
 #'   
 #' @examples
 #' 

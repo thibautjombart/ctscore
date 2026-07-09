@@ -33,51 +33,78 @@ expect_mean <- function(x, mu, sigma2, z = 5) {
   expect_lt(abs(mean(x) - mu), z * se)
 }
 
-# ------------------------------------
-#           Tests
-# ------------------------------------
+##########################
+## Input validation:
+##########################
 
-test_that("sim_ctdata returns a ctdata usable by ctscore", {
-  set.seed(1)
-  sim <- sim_ctdata(n_contacts = 50)
-
-  ## it is a simulated ctdata carrying the latent truth
-  expect_s3_class(sim, "sim_ctdata")
-  expect_s3_class(sim, "ctdata")
-  expect_true(all(c("p_infection", "infected", "onset") %in% names(sim)))
-
-  ## p_infection matches the declared per-type probability (default = 0.1)
-  expect_equal(sim$p_infection, unname(unlist(list(default = 0.1)[sim$type])))
-
-  ## being a ctdata, it feeds ctscore() directly
-  sc <- ctscore(sim, incub = c(1, 2, 3, 4, 5, 6, 7), current_date = 31)
-  expect_length(sc, length(unique(sim$contact_id)))
-  expect_true(all(sc >= 0 & sc <= 1))
+test_that("sim_ctdata rejects invalid inputs", {
+  ## naming conventions
+  expect_error(sim_ctdata(infection_proba = list(0.1, b = 0.2)), "named lists")
+  
+  expect_error(sim_ctdata(
+    locations = list(A = 1),
+    n_exposures = list(A = 1, B = 1)
+  ),
+  "same names")
+  
+  expect_error(sim_ctdata(
+    infection_proba = list(a = 0.1, b = 0.2),
+    type_weights = list(a = 1, c = 1)
+  ),
+  "same names")
+  
+  ## values must be in range
+  expect_error(sim_ctdata(infection_proba = list(default = 1.5)), "\\[0, 1\\]")
+  
+  expect_error(sim_ctdata(duration = 10, n_exposures = list(default = 20)), "between 1 and")
 })
+
+##########################
+## Output validation:
+##########################
+
 
 test_that("infection status and onset are internally consistent", {
   set.seed(1)
-  sim <- sim_ctdata(n_contacts = 2000)
-
+  sim <- sim_ctdata(
+    n_contacts = 2000,
+    n_exposures = list(A = 3, B = 3),
+    locations = list(A = 0.5, B = 0.5)
+  )
+  
   ## at least one contact is infected under the default probability
   expect_true(any(sim$infected))
-
+  
   ## onset is recorded exactly for infected contacts
   expect_false(all(is.na(sim$onset[sim$infected])))
   expect_true(all(is.na(sim$onset[!sim$infected])))
-
-  ## infected status and onset are unique for a contact
-  one <- function(x) length(unique(x)) == 1L
+  
+  ## infected, onset and location are unique per contact_id
+  one <- function(x)
+    length(unique(x)) == 1L
   expect_true(all(tapply(sim$infected, sim$contact_id, one)))
   expect_true(all(tapply(sim$onset, sim$contact_id, one)))
-
+  expect_true(all(tapply(sim$location, sim$contact_id, one)))
+  
   ## no infection (and no onset) when the probability is zero
-  sim0 <- sim_ctdata(n_contacts = 2000, infection_proba = list(default = 0))
+  sim0 <- sim_ctdata(n_contacts = 2000,
+                     infection_proba = list(default = 0))
   expect_false(any(sim0$infected))
   expect_true(all(is.na(sim0$onset)))
 })
 
-test_that("number of exposures matches the input distribution", {
+
+test_that("type_weights are respected", {
+  sim <- sim_ctdata(
+    n_contacts = 200,
+    infection_proba = list(a = 0.5, b = 0.5),
+    type_weights = list(b = 0, a = 1)
+  )
+  expect_true(all(sim$type == "a"))
+})
+
+
+test_that("n_exposures are respected", {
   set.seed(1)
   n_exp <- 1L + rpois(5000, 3)
   ## exposures are never censored, so every drawn exposure yields one row
@@ -92,7 +119,7 @@ test_that("number of exposures matches the input distribution", {
   expect_mean(per_contact, mean(n_exp), var(n_exp))
 })
 
-test_that("infection probability matches infection_proba for each type", {
+test_that("infection_proba are respected", {
   set.seed(1)
   p <- list(low = 0.1, high = 0.9)
   ## one exposure per contact -> P(infected) is exactly that type's probability
@@ -107,14 +134,22 @@ test_that("infection probability matches infection_proba for each type", {
   }
 })
 
-test_that("contacts are split across locations as specified", {
+test_that("locations are respected", {
   set.seed(1)
-  locs <- list(A = 0.5, B = 0.2, C = 0.2, D = 0.1)
-
+  locs <- list(A = 0.5,
+               B = 0.2,
+               C = 0.2,
+               D = 0.1)
+  
   ## one exposure per location so every contact contributes a single row
   sim <- sim_ctdata(
     n_contacts = 5000,
-    n_exposures = list(A = 1, B = 1, C = 1, D = 1),
+    n_exposures = list(
+      A = 1,
+      B = 1,
+      C = 1,
+      D = 1
+    ),
     infection_proba = list(default = 0),
     locations = locs
   )
@@ -122,4 +157,26 @@ test_that("contacts are split across locations as specified", {
   for (loc in names(locs)) {
     expect_proportion(sim$location == loc, shares[[loc]])
   }
+})
+
+##########################
+## Compatibility with ctscore():
+##########################
+
+test_that("sim_ctdata returns a ctdata usable by ctscore", {
+  set.seed(1)
+  n_contacts = 50
+  sim <- sim_ctdata(n_contacts = n_contacts)
+  
+  ## check class and required columns
+  expect_s3_class(sim, "sim_ctdata")
+  expect_s3_class(sim, "ctdata")
+  expect_true(all(c("p_infection", "infected", "onset") %in% names(sim)))
+  
+  
+  sc <- ctscore(sim,
+                incub = c(1, 2, 3, 4, 5, 6, 7),
+                current_date = 31)
+  expect_length(sc, n_contacts)
+  expect_true(all(sc >= 0 & sc <= 1))
 })
