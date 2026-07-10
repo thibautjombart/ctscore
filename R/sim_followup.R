@@ -34,7 +34,7 @@
 #'   simulations; currently available values are: "random"; see details section
 #'   for more information
 #' 
-#' @return `x` with columns `last_visit`, `detected` and `detection_date` updated according to the follow-up strategy.
+#' @return `x` with columns `last_visit` and `detection_date` updated according to the follow-up strategy.
 #'   
 #' @details
 #' Available follow-up strategies (`strategy` argument) include:
@@ -52,6 +52,11 @@
 #'   ctscore every day of the simulation; as many contacts as possible are 
 #'   visited in the first chosen location, then if capacity remains, in the 
 #'   second, third, etc.  
+#' 
+#' @examples
+#' sim_ctdata() |> 
+#' sim_followup(coverage = 0.2, delay = 7, strategy = "random") |> 
+#' plot()
 #' 
 sim_followup <- function(x, 
                          time = 1, 

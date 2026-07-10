@@ -11,7 +11,7 @@ sim_ctdata(
   locations = list(default = 1),
   n_exposures = list(default = 1),
   infection_proba = list(default = 0.1),
-  type_weights = NULL
+  type_proba = NULL
 )
 }
 \arguments{
@@ -28,16 +28,16 @@ Names must match \code{n_exposures}.}
 Names must match \code{locations}.}
 
 \item{infection_proba}{Named list giving the probability of infection for each exposure type.
-Names must match \code{type_weights}.}
+Names must match \code{type_proba}.}
 
-\item{type_weights}{Named list giving the relative frequency of each exposure type. Names must match \code{infection_proba}. Defaults to uniform.}
+\item{type_proba}{Named list giving the relative probability of each exposure type. Names must match \code{infection_proba}. Defaults to uniform.}
 }
 \value{
 An object of class \code{c("sim_ctdata", "ctdata", "data.frame")} with one
-row per exposure. It carries the standard \code{ctdata} columns (\code{contact_id},
-\code{date}, \code{type}, \code{location}, \code{last_visit}, \code{p_infection}) plus the
-simulation truth \code{infected} (logical, per contact) and \code{onset} (symptom
-onset day, \code{NA} when not infected).
+row per exposure. Alongside the standard \code{ctdata} columns it carries the
+simulation ground truth, constant within each contact: \code{infected} (logical),
+\code{infection_date} (day of the infecting exposure, \code{NA} if not infected), and
+\code{onset} (= \code{infection_date} + incubation, \code{NA} if not infected).
 }
 \description{
 Simulate contact tracing data for a set of contacts. A contact has one or
@@ -52,7 +52,7 @@ incub = 1:7,
 locations = list(cityA = 0.8, cityB = 0.2),
 n_exposures = list(cityA = 2, cityB = c(2,2,3,4,5,10)),
 infection_proba = list(household = 0.2, funeral = 0.4),
-type_weights = list(household = 0.7, funeral = 0.3)
+type_proba = list(household = 0.7, funeral = 0.3)
 )
 head(x)
 class(x)
