@@ -13,7 +13,10 @@ make_ctdata(
   type = "default",
   location = "default",
   infection_proba = list(default = 0),
-  last_visit
+  last_visit = NA_real_,
+  infected = NA,
+  onset = NA_real_,
+  ...
 )
 ```
 
@@ -53,12 +56,34 @@ make_ctdata(
   symptoms; the type provided must match that of `date`; if the contact
   has not been visited yet, this should be `NA`
 
+- infected:
+
+  `logical` infection status per contact, or `NA` when unknown; defaults
+  to `NA`.
+
+- onset:
+
+  the date of symptom onset for the contact; the type provided must
+  match that of `date`; if the contact has not developed symptoms, this
+  should be `NA`
+
+- ...:
+
+  additional named vectors to append as extra columns; each must be
+  length 1 (recycled) or match the number of rows, and names must not
+  clash with existing columns
+
 ## Value
 
 A `ctdata` object, which is a validated and ordered (by contact ID and
 date of exposure) `data.frame` designed to be used in the
 [ctscore](thibautjombart.github.io/ctscore/reference/ctscore.md)
 function.
+
+## See also
+
+[`sim_ctdata()`](thibautjombart.github.io/ctscore/reference/sim_ctdata.md)
+to simulate contact tracing data.
 
 ## Author
 
@@ -77,11 +102,16 @@ x <- make_ctdata(
   last_visit = Sys.Date() - c(4, 4, 1, NA)
 )
 x
-#>   contact_id       date    type  location last_visit p_infection
-#> 1          1 2026-07-01  normal some-town 2026-07-03         0.2
-#> 2          1 2026-07-03 funeral some-town 2026-07-03         0.9
-#> 3          2 2026-07-05  normal some-town 2026-07-06         0.2
-#> 4          3 2026-07-05  normal some-town       <NA>         0.2
+#>   contact_id       date    type  location last_visit infected onset
+#> 1          1 2026-07-07  normal some-town 2026-07-09       NA    NA
+#> 2          1 2026-07-09 funeral some-town 2026-07-09       NA    NA
+#> 3          2 2026-07-11  normal some-town 2026-07-12       NA    NA
+#> 4          3 2026-07-11  normal some-town       <NA>       NA    NA
+#>   infection_proba
+#> 1             0.2
+#> 2             0.9
+#> 3             0.2
+#> 4             0.2
 class(x)
 #> [1] "ctdata"     "data.frame"
 ```

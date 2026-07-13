@@ -38,18 +38,24 @@ x <- make_ctdata(
   last_visit = Sys.Date() - c(4, 4, 1, NA, NA)
 )
 x
-#>   contact_id       date    type  location last_visit p_infection
-#> 1          1 2026-07-01  normal some-town 2026-07-03         0.2
-#> 2          1 2026-07-03 funeral some-town 2026-07-03         0.9
-#> 3          2 2026-07-05  normal some-town 2026-07-06         0.2
-#> 4          3 2026-07-04 funeral   sincity       <NA>         0.9
-#> 5          3 2026-07-05  normal   sincity       <NA>         0.2
+#>   contact_id       date    type  location last_visit infected onset
+#> 1          1 2026-07-07  normal some-town 2026-07-09       NA    NA
+#> 2          1 2026-07-09 funeral some-town 2026-07-09       NA    NA
+#> 3          2 2026-07-11  normal some-town 2026-07-12       NA    NA
+#> 4          3 2026-07-10 funeral   sincity       <NA>       NA    NA
+#> 5          3 2026-07-11  normal   sincity       <NA>       NA    NA
+#>   infection_proba
+#> 1             0.2
+#> 2             0.9
+#> 3             0.2
+#> 4             0.9
+#> 5             0.2
 
 extract_indiv_data(x)
-#>   contact_id  location last_visit
-#> 1          1 some-town 2026-07-03
-#> 3          2 some-town 2026-07-06
-#> 4          3   sincity       <NA>
+#>   contact_id  location last_visit infected onset
+#> 1          1 some-town 2026-07-09       NA    NA
+#> 3          2 some-town 2026-07-12       NA    NA
+#> 4          3   sincity       <NA>       NA    NA
 
 ## with a ctdata object containing scores (returned by ctscore())
 scores <- ctscore(x, 
@@ -59,13 +65,13 @@ scores <- ctscore(x,
 )
 
 scores
-#>   contact_id  location last_visit      score
-#> 1          1 some-town 2026-07-03 0.57102564
-#> 3          2 some-town 2026-07-06 0.01538462
-#> 4          3   sincity       <NA> 0.20923077
+#>   contact_id  location last_visit infected onset      score
+#> 1          1 some-town 2026-07-09       NA    NA 0.57102564
+#> 3          2 some-town 2026-07-12       NA    NA 0.01538462
+#> 4          3   sincity       <NA>       NA    NA 0.20923077
 extract_indiv_data(scores)
-#>   contact_id  location last_visit      score
-#> 1          1 some-town 2026-07-03 0.57102564
-#> 3          2 some-town 2026-07-06 0.01538462
-#> 4          3   sincity       <NA> 0.20923077
+#>   contact_id  location last_visit infected onset      score
+#> 1          1 some-town 2026-07-09       NA    NA 0.57102564
+#> 3          2 some-town 2026-07-12       NA    NA 0.01538462
+#> 4          3   sincity       <NA>       NA    NA 0.20923077
 ```

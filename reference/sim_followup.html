@@ -86,7 +86,7 @@ the incubation time distribution; defaults to 21 days</p></dd>
 
 
 <dt id="arg-coverage">coverage<a class="anchor" aria-label="anchor" href="#arg-coverage"></a></dt>
-<dd><p>the proportion of contacts visited at any time step; defaults
+<dd><p>the expected proportion of contacts visited at any time step; defaults
 to 0 - no follow-up</p></dd>
 
 
@@ -96,6 +96,10 @@ simulations; currently available values are: "random"; see details section
 for more information</p></dd>
 
 </dl></div>
+    <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    <p><code>x</code> with columns <code>last_visit</code> and <code>detection_date</code> updated according to the follow-up strategy.</p>
+    </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>Available follow-up strategies (<code>strategy</code> argument) include:</p><ul><li><p>"random": individuals are visited at random every day of the simulation</p></li>
@@ -119,16 +123,25 @@ or <code><a href="sim_ctdata.html">sim_ctdata()</a></code> to simulate them</p><
     <p>Thibaut Jombart</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="sim_ctdata.html">sim_ctdata</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span></span>
+<span class="r-in"><span><span class="fu">sim_followup</span><span class="op">(</span>coverage <span class="op">=</span> <span class="fl">0.2</span>, delay <span class="op">=</span> <span class="fl">7</span>, strategy <span class="op">=</span> <span class="st">"random"</span><span class="op">)</span> <span class="op">|&gt;</span> </span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="sim_followup-1.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Thibaut Jombart.</p>
+  <p>Developed by Thibaut Jombart, Cyril Geismar.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

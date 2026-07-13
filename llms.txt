@@ -102,13 +102,20 @@ x <- make_ctdata(
 )
 
 head(x)
-#>   contact_id date      type   location last_visit p_infection
-#> 1          1    5 household   new_city         13         0.2
-#> 2         10   10 household local_town         NA         0.2
-#> 3         11    2 household   new_city         NA         0.2
-#> 4         12    7   funeral    hotspot          9         0.9
-#> 5         13    9   funeral local_town          9         0.9
-#> 6         13   15 household local_town          9         0.2
+#>   contact_id date      type   location last_visit infected onset
+#> 1          1    5 household   new_city         13       NA    NA
+#> 2         10   10 household local_town         NA       NA    NA
+#> 3         11    2 household   new_city         NA       NA    NA
+#> 4         12    7   funeral    hotspot          9       NA    NA
+#> 5         13    9   funeral local_town          9       NA    NA
+#> 6         13   15 household local_town          9       NA    NA
+#>   infection_proba
+#> 1             0.2
+#> 2             0.2
+#> 3             0.2
+#> 4             0.9
+#> 5             0.9
+#> 6             0.2
 class(x)
 #> [1] "ctdata"     "data.frame"
 ```
@@ -190,13 +197,13 @@ through the argument `out_type`:
 res <- ctscore(x, incub, current_date = 31, out_type = "ctdata") %>% 
     arrange(desc(score))
 head(res)
-#>   contact_id   location last_visit     score
-#> 1         14    hotspot         15 0.9717469
-#> 2         13 local_town          9 0.9095882
-#> 3         30 local_town         NA 0.8972808
-#> 4         12    hotspot          9 0.8946356
-#> 5         24    hotspot         NA 0.8887095
-#> 6          6 local_town         NA 0.8492772
+#>   contact_id   location last_visit infected onset     score
+#> 1         14    hotspot         15       NA    NA 0.9717469
+#> 2         13 local_town          9       NA    NA 0.9095882
+#> 3         30 local_town         NA       NA    NA 0.8972808
+#> 4         12    hotspot          9       NA    NA 0.8946356
+#> 5         24    hotspot         NA       NA    NA 0.8887095
+#> 6          6 local_town         NA       NA    NA 0.8492772
 
 ## ctdata object with scores appended, sorted by score
 res_full <- ctscore(x, incub, current_date = 31, out_type = "ctdata_full") %>% 
@@ -228,13 +235,20 @@ system works.
 ``` r
 
 head(res_full)
-#>   contact_id date      type   location last_visit p_infection     score
-#> 1         14    1 household    hotspot         15         0.2 0.9717469
-#> 2         14   11   funeral    hotspot         15         0.9 0.9717469
-#> 3         14   13   funeral    hotspot         15         0.9 0.9717469
-#> 4         14   20 household    hotspot         15         0.2 0.9717469
-#> 5         13    9   funeral local_town          9         0.9 0.9095882
-#> 6         13   15 household local_town          9         0.2 0.9095882
+#>   contact_id date      type   location last_visit infected onset
+#> 1         14    1 household    hotspot         15       NA    NA
+#> 2         14   11   funeral    hotspot         15       NA    NA
+#> 3         14   13   funeral    hotspot         15       NA    NA
+#> 4         14   20 household    hotspot         15       NA    NA
+#> 5         13    9   funeral local_town          9       NA    NA
+#> 6         13   15 household local_town          9       NA    NA
+#>   infection_proba     score
+#> 1             0.2 0.9717469
+#> 2             0.9 0.9717469
+#> 3             0.9 0.9717469
+#> 4             0.2 0.9717469
+#> 5             0.9 0.9095882
+#> 6             0.2 0.9095882
 ```
 
 The first contact (ID 14) has the highest score because they had
@@ -247,13 +261,20 @@ a long time ago.
 ``` r
 
 tail(res_full)
-#>    contact_id date      type   location last_visit p_infection      score
-#> 41         19    6 household    hotspot         30         0.2 0.15502167
-#> 42         19   12 household    hotspot         30         0.2 0.15502167
-#> 43         19   13 household    hotspot         30         0.2 0.15502167
-#> 44         21   27   funeral    hotspot         29         0.9 0.14895995
-#> 45         29   29   funeral local_town         NA         0.9 0.05915784
-#> 46         20   29 household    hotspot         NA         0.2 0.01314619
+#>    contact_id date      type   location last_visit infected onset
+#> 41         19    6 household    hotspot         30       NA    NA
+#> 42         19   12 household    hotspot         30       NA    NA
+#> 43         19   13 household    hotspot         30       NA    NA
+#> 44         21   27   funeral    hotspot         29       NA    NA
+#> 45         29   29   funeral local_town         NA       NA    NA
+#> 46         20   29 household    hotspot         NA       NA    NA
+#>    infection_proba      score
+#> 41             0.2 0.15502167
+#> 42             0.2 0.15502167
+#> 43             0.2 0.15502167
+#> 44             0.9 0.14895995
+#> 45             0.9 0.05915784
+#> 46             0.2 0.01314619
 ```
 
 The very last contact (ID 20) has a low score because of a single ‘weak’

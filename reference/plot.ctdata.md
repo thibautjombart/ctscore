@@ -35,7 +35,7 @@ Cyril Geismar
 
 ``` r
 if (FALSE) { # \dontrun{
-## simulated data (also shows symptom onset)
+## simulated data (also shows infection date and symptom onset)
 plot(sim_ctdata())
 
 } # }

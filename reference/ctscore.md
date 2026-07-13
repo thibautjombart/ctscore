@@ -78,11 +78,11 @@ res
 ## scores appended
 res <- ctscore(x, incub, out_type = "ctdata")
 res
-#>   contact_id  location last_visit     score
-#> 1          1 some-town 2026-07-03 0.5266667
-#> 3          2 some-town 2026-07-06 0.1000000
-#> 4          3 some-town 2026-07-06 0.0000000
-#> 5          4 some-town 2026-07-04 0.0000000
+#>   contact_id  location last_visit infected onset     score
+#> 1          1 some-town 2026-07-09       NA    NA 0.5266667
+#> 3          2 some-town 2026-07-12       NA    NA 0.1000000
+#> 4          3 some-town 2026-07-12       NA    NA 0.0000000
+#> 5          4 some-town 2026-07-10       NA    NA 0.0000000
 
 ## other example using `distcrete` to build the incubation time distribution
 incub <- distcrete::distcrete("gamma", interval = 1, shape = 2, scale = 2.5, w = 0)
@@ -104,20 +104,26 @@ res_df
 ### ctdata object of individuals with scores appended
 res_ctdata <- ctscore(x, incub, out_type = "ctdata")
 res_ctdata
-#>   contact_id  location last_visit      score
-#> 1          1 some-town 2026-07-03 0.36501065
-#> 3          2 some-town 2026-07-06 0.04806079
-#> 4          3 some-town 2026-07-06 0.02763199
-#> 5          4 some-town 2026-07-04 0.00000000
+#>   contact_id  location last_visit infected onset      score
+#> 1          1 some-town 2026-07-09       NA    NA 0.36501065
+#> 3          2 some-town 2026-07-12       NA    NA 0.04806079
+#> 4          3 some-town 2026-07-12       NA    NA 0.02763199
+#> 5          4 some-town 2026-07-10       NA    NA 0.00000000
 
 
 ### same, with all original exposure data
 res_ctdata_full <- ctscore(x, incub, out_type = "ctdata_full")
 res_ctdata_full
-#>   contact_id       date    type  location last_visit p_infection      score
-#> 1          1 2026-07-01  normal some-town 2026-07-03         0.2 0.36501065
-#> 2          1 2026-07-03 funeral some-town 2026-07-05         0.9 0.36501065
-#> 3          2 2026-07-02  normal some-town 2026-07-06         0.2 0.04806079
-#> 4          3 2026-07-06  normal some-town 2026-07-06         0.2 0.02763199
-#> 5          4 2026-07-02    null some-town 2026-07-04         0.0 0.00000000
+#>   contact_id       date    type  location last_visit infected onset
+#> 1          1 2026-07-07  normal some-town 2026-07-09       NA    NA
+#> 2          1 2026-07-09 funeral some-town 2026-07-11       NA    NA
+#> 3          2 2026-07-08  normal some-town 2026-07-12       NA    NA
+#> 4          3 2026-07-12  normal some-town 2026-07-12       NA    NA
+#> 5          4 2026-07-08    null some-town 2026-07-10       NA    NA
+#>   infection_proba      score
+#> 1             0.2 0.36501065
+#> 2             0.9 0.36501065
+#> 3             0.2 0.04806079
+#> 4             0.2 0.02763199
+#> 5             0.0 0.00000000
 ```

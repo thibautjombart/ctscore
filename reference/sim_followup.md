@@ -49,14 +49,19 @@ sim_followup(
 
 - coverage:
 
-  the proportion of contacts visited at any time step; defaults to 0 -
-  no follow-up
+  the expected proportion of contacts visited at any time step; defaults
+  to 0 - no follow-up
 
 - strategy:
 
   a `character` indicating the follow-up strategy to use in the
   simulations; currently available values are: "random"; see details
   section for more information
+
+## Value
+
+`x` with columns `last_visit` and `detection_date` updated according to
+the follow-up strategy.
 
 ## Details
 
@@ -87,3 +92,12 @@ to simulate them
 ## Author
 
 Thibaut Jombart
+
+## Examples
+
+``` r
+sim_ctdata() |> 
+sim_followup(coverage = 0.2, delay = 7, strategy = "random") |> 
+plot()
+
+```
