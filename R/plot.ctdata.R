@@ -15,7 +15,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' ## simulated data (also shows symptom onset)
+#' ## simulated data (also shows infection date and symptom onset)
 #' plot(sim_ctdata())
 #'
 #' }
@@ -36,7 +36,7 @@ plot.ctdata <- function(x, ...) {
   seg <- do.call(
     rbind,
     by(data = x, INDICES = x$contact, FUN = function(d) {
-      days <- c(d$date, d$last_visit, d$onset)
+      days <- c(d$date, d$last_visit, d$onset, d$infection_date, d$detection_date)
       data.frame(
         contact = d$contact[1L],
         location = d$location[1L],
@@ -84,9 +84,33 @@ plot.ctdata <- function(x, ...) {
       )
   }
 
+  ## infection date (diamond) (sim_ctdata only): marks the infecting exposure
+  if ("infection_date" %in% names(x)) {
+    p <- p +
+      ggplot2::geom_point(
+        data = pc[!is.na(pc$infection_date), ],
+        ggplot2::aes(
+          x = infection_date, y = contact, shape = "infection"
+        ),
+        size = 3
+      )
+  }
+
+  ## detection date (asterisk) (after sim_followup only)
+  if ("detection_date" %in% names(x)) {
+    p <- p +
+      ggplot2::geom_point(
+        data = pc[!is.na(pc$detection_date), ],
+        ggplot2::aes(
+          x = detection_date, y = contact, shape = "detection"
+        ),
+        size = 3
+      )
+  }
+
   p <- p +
     ggplot2::scale_shape_manual(
-      values = c("onset" = 17, "last visit" = 4),
+      values = c("infection" = 18, "onset" = 17, "last visit" = 15, "detection" = 8),
       name = NULL
     ) +
     ggplot2::coord_cartesian(clip = "off") +

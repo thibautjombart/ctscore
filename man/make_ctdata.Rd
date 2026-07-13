@@ -10,7 +10,10 @@ make_ctdata(
   type = "default",
   location = "default",
   infection_proba = list(default = 0),
-  last_visit
+  last_visit = NA_real_,
+  infected = NA,
+  onset = NA_real_,
+  ...
 )
 }
 \arguments{
@@ -35,6 +38,17 @@ probability of infection for a given contact; defaults to a list with
 \item{last_visit}{the date of the last visit to the contact, where they
 exhibited no symptoms; the type provided must match that of \code{date}; if the
 contact has not been visited yet, this should be \code{NA}}
+
+\item{infected}{\code{logical} infection status per contact, or \code{NA} when unknown;
+defaults to \code{NA}.}
+
+\item{onset}{the date of symptom onset for the contact; the type provided
+must match that of \code{date}; if the contact has not developed symptoms,
+this should be \code{NA}}
+
+\item{...}{additional named vectors to append as extra columns; each must be
+length 1 (recycled) or match the number of rows, and names must not clash
+with existing columns}
 }
 \value{
 A \code{ctdata} object, which is a validated and ordered (by contact ID

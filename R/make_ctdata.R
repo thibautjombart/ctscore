@@ -28,7 +28,18 @@
 #' @param last_visit the date of the last visit to the contact, where they 
 #'   exhibited no symptoms; the type provided must match that of `date`; if the 
 #'   contact has not been visited yet, this should be `NA`
-#'  
+#' 
+#' @param infected `logical` infection status per contact, or `NA` when unknown; 
+#' defaults to `NA`.
+#' 
+#' @param onset the date of symptom onset for the contact; the type provided 
+#' must match that of `date`; if the contact has not developed symptoms, 
+#' this should be `NA`
+#' 
+#' @param ... additional named vectors to append as extra columns; each must be
+#'   length 1 (recycled) or match the number of rows, and names must not clash
+#'   with existing columns
+#' 
 #' @return A `ctdata` object, which is a validated and ordered (by contact ID
 #'   and date of exposure) `data.frame` designed to be used in the [ctscore] 
 #'   function.
@@ -53,15 +64,28 @@ make_ctdata <- function(contact_id,
                         type = "default", 
                         location = "default", 
                         infection_proba = list(default = 0), 
-                        last_visit
+                        last_visit = NA_real_,
+                        infected = NA,
+                        onset = NA_real_,
+                        ...
                         ) {
   out <- data.frame(
     contact_id = process_contact_id(contact_id), 
     date = process_date(date),
     type = process_type(type), 
     location = process_location(location), 
-    last_visit = process_date(last_visit, na_ok = TRUE)
+    last_visit = process_date(last_visit, na_ok = TRUE),
+    infected = process_infected(infected),
+    onset = process_date(onset, na_ok = TRUE)
   )
+  ## a symptom onset date implies the contact is infected
+  process_onset_infected(out$onset, out$infected)
+
+  ## append any additional user-supplied columns
+  extra <- process_extra_columns(list(...), n_rows = nrow(out))
+  for (nm in names(extra)) out[[nm]] <- extra[[nm]]
+
+
   class(out) <- c("ctdata", class(out))
   
   ## process the infection_proba argument and add infection probabilities to the
@@ -69,7 +93,7 @@ make_ctdata <- function(contact_id,
   out <- add_infection_proba(out, infection_proba)
   
   ## reorder output by: contact_id, date
-  out <- dplyr::arrange(out, contact_id, date)
+  out <- dplyr::arrange(out, contact_id, date) #@thibautjombart dplyr is in suggests so you may need a requireNamespace("dplyr") here
   out
 }
 

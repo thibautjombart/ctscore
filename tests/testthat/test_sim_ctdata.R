@@ -49,7 +49,7 @@ test_that("sim_ctdata rejects invalid inputs", {
   
   expect_error(sim_ctdata(
     infection_proba = list(a = 0.1, b = 0.2),
-    type_weights = list(a = 1, c = 1)
+    type_proba = list(a = 1, c = 1)
   ),
   "same names")
   
@@ -85,20 +85,29 @@ test_that("infection status and onset are internally consistent", {
   expect_true(all(tapply(sim$infected, sim$contact_id, one)))
   expect_true(all(tapply(sim$onset, sim$contact_id, one)))
   expect_true(all(tapply(sim$location, sim$contact_id, one)))
+
+  ## infection_date follows the same NA pattern as onset
+  expect_true(all(is.na(sim$infection_date[!sim$infected])))
+  expect_false(all(is.na(sim$infection_date[sim$infected])))
+  expect_true(all(tapply(sim$infection_date, sim$contact_id, one)))
+
+  ## onset is on/after the infection date 
+  expect_true(all(sim$onset[sim$infected] >= sim$infection_date[sim$infected]))
   
   ## no infection (and no onset) when the probability is zero
   sim0 <- sim_ctdata(n_contacts = 2000,
                      infection_proba = list(default = 0))
   expect_false(any(sim0$infected))
   expect_true(all(is.na(sim0$onset)))
+  expect_true(all(is.na(sim0$infection_date)))
 })
 
 
-test_that("type_weights are respected", {
+test_that("type_proba are respected", {
   sim <- sim_ctdata(
     n_contacts = 200,
     infection_proba = list(a = 0.5, b = 0.5),
-    type_weights = list(b = 0, a = 1)
+    type_proba = list(b = 0, a = 1)
   )
   expect_true(all(sim$type == "a"))
 })
@@ -171,7 +180,7 @@ test_that("sim_ctdata returns a ctdata usable by ctscore", {
   ## check class and required columns
   expect_s3_class(sim, "sim_ctdata")
   expect_s3_class(sim, "ctdata")
-  expect_true(all(c("p_infection", "infected", "onset") %in% names(sim)))
+  expect_true(all(c("infection_proba", "infected", "infection_date", "onset") %in% names(sim)))
   
   
   sc <- ctscore(sim,

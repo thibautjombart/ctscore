@@ -90,7 +90,7 @@ ctscore <- function(
   ## calculate the probability of infection
   out <- vapply(
     list_x, 
-    function(e) calculate_ctscore(p_inf = e$p_infection, 
+    function(e) calculate_ctscore(p_inf = e$infection_proba, 
                                   e = e$date, 
                                   s = max(e$last_visit), 
                                   t = current_date, 

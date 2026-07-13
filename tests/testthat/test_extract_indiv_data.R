@@ -24,8 +24,8 @@ test_that(
     res <- extract_indiv_data(x)
     
     expect_equal(nrow(res), length(unique(x$contact_id)))
-    expect_equal(ncol(res), ncol(x) - 3) # date, type and p_infection are removed
-    expect_equal(names(res), c("contact_id", "location", "last_visit"))
+    expect_equal(ncol(res), ncol(x) - 3) # date, type and infection_proba are removed
+    expect_equal(names(res), c("contact_id", "location", "last_visit", "infected", "onset"))
   
   
   ## test function with a ctdata() object containing scores (returned by ctscore())
@@ -36,8 +36,8 @@ test_that(
                     )
   res <- extract_indiv_data(scores)
   expect_equal(nrow(res), length(unique(scores$contact_id)))
-  expect_equal(ncol(res), ncol(scores) - 3) # date, type and p_infection are removed
-  expect_equal(names(res), c("contact_id", "location", "last_visit", "score"))
+  expect_equal(ncol(res), ncol(scores) - 3) # date, type and infection_proba are removed
+  expect_equal(names(res), c("contact_id", "location", "last_visit", "infected", "onset", "score"))
   
   }
 )

@@ -151,7 +151,7 @@ test_that(
     )
     expect_identical(
       names(res_3) , 
-      c("contact_id", "location", "last_visit", "score")
+      c("contact_id", "location", "last_visit", "infected", "onset", "score")
     )
     expect_identical(
       names(res_4) , 

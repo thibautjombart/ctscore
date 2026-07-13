@@ -21,7 +21,7 @@ along a time axis. Contacts are ordered by first exposure day.
 }
 \examples{
 \dontrun{
-## simulated data (also shows symptom onset)
+## simulated data (also shows infection date and symptom onset)
 plot(sim_ctdata())
 
 }

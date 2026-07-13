@@ -21,15 +21,15 @@
 #' Names must match `locations`.
 #'
 #' @param infection_proba Named list giving the probability of infection for each exposure type.
-#' Names must match `type_weights`.
+#' Names must match `type_proba`.
 #'
-#' @param type_weights Named list giving the relative frequency of each exposure type. Names must match `infection_proba`. Defaults to uniform.
+#' @param type_proba Named list giving the relative probability of each exposure type. Names must match `infection_proba`. Defaults to uniform.
 #'
 #' @return An object of class `c("sim_ctdata", "ctdata", "data.frame")` with one
-#'   row per exposure. It carries the standard `ctdata` columns (`contact_id`,
-#'   `date`, `type`, `location`, `last_visit`, `p_infection`) plus the
-#'   simulation truth `infected` (logical, per contact) and `onset` (symptom
-#'   onset day, `NA` when not infected).
+#'   row per exposure. Alongside the standard `ctdata` columns it carries the
+#'   simulation ground truth, constant within each contact: `infected` (logical),
+#'   `infection_date` (day of the infecting exposure, `NA` if not infected), and
+#'   `onset` (= `infection_date` + incubation, `NA` if not infected).
 #'
 #' @seealso [make_ctdata()] to create a `ctdata` object from real data.
 #'
@@ -41,7 +41,7 @@
 #' locations = list(cityA = 0.8, cityB = 0.2),
 #' n_exposures = list(cityA = 2, cityB = c(2,2,3,4,5,10)),
 #' infection_proba = list(household = 0.2, funeral = 0.4),
-#' type_weights = list(household = 0.7, funeral = 0.3)
+#' type_proba = list(household = 0.7, funeral = 0.3)
 #' )
 #' head(x)
 #' class(x)
@@ -53,10 +53,10 @@ sim_ctdata <- function(n_contacts = 100,
                        locations = list(default = 1),
                        n_exposures = list(default = 1),
                        infection_proba = list(default = 0.1),
-                       type_weights = NULL) {
+                       type_proba = NULL) {
   ## Input validation
   ## `locations`/`n_exposures` are keyed by location,
-  ## `infection_proba`/ `type_weights` by exposure type
+  ## `infection_proba`/ `type_proba` by exposure type
   is_named_list <- function(x) {
     is.list(x) &&
       length(x) > 0L && !is.null(names(x)) && all(nzchar(names(x)))
@@ -70,12 +70,12 @@ sim_ctdata <- function(n_contacts = 100,
   if (!setequal(names(locations), names(n_exposures))) {
     stop("`locations` and `n_exposures` must have the same names")
   }
-  if (!is.null(type_weights)) {
-    if (!is_named_list(type_weights)) {
-      stop("`type_weights` must be a named list")
+  if (!is.null(type_proba)) {
+    if (!is_named_list(type_proba)) {
+      stop("`type_proba` must be a named list")
     }
-    if (!setequal(names(infection_proba), names(type_weights))) {
-      stop("`infection_proba` and `type_weights` must have the same names")
+    if (!setequal(names(infection_proba), names(type_proba))) {
+      stop("`infection_proba` and `type_proba` must have the same names")
     }
   }
   
@@ -117,21 +117,18 @@ sim_ctdata <- function(n_contacts = 100,
     type <- sample(names(infection_proba),
                    k,
                    replace = TRUE,
-                   prob = if (is.null(type_weights)) {
+                   prob = if (is.null(type_proba)) {
                      NULL
                    } else {
-                     unlist(type_weights)[names(infection_proba)]
+                     unlist(type_proba)[names(infection_proba)]
                    })
     pi_e <- calculate_p_infection(unlist(infection_proba[type]))
     
     ## Sample the exposure responsible for infection (NA = not infected)
     k_inf <- sample(c(seq_along(pi_e), NA), 1, prob = c(pi_e, 1 - sum(pi_e)))
     infected <- !is.na(k_inf)
-    
-    t_ons <- if (infected)
-      te[k_inf] + dist$incub[id]
-    else
-      NA_real_
+    t_inf <- if (infected) te[k_inf] else NA_real_
+    t_ons <- if (infected) te[k_inf] + dist$incub[id] else NA_real_
     
     data.frame(
       contact_id = id,
@@ -140,6 +137,7 @@ sim_ctdata <- function(n_contacts = 100,
       location = l,
       last_visit = NA_real_,
       infected = infected,
+      infection_date = t_inf,
       onset = t_ons,
       stringsAsFactors = FALSE
     )
@@ -147,21 +145,17 @@ sim_ctdata <- function(n_contacts = 100,
   
   ct <- do.call(rbind, lapply(seq_len(n_contacts), one_ct))
   
-  out <- make_ctdata(
+ out <- make_ctdata(
     contact_id = ct$contact_id,
     date = ct$date,
     type = ct$type,
     location = ct$location,
     infection_proba = infection_proba[unique(ct$type)],
-    last_visit = ct$last_visit
+    last_visit = ct$last_visit,
+    infected = ct$infected,
+    infection_date = ct$infection_date,
+    onset = ct$onset
   )
-  
-  ## Re-attach simulation truth removed by make_ctdata().
-  ## Infection status and onset are constant per contact, so match using contact_id.
-  truth <- ct[!duplicated(ct$contact_id), c("contact_id", "infected", "onset")]
-  i <- match(out$contact_id, truth$contact_id)
-  out$infected <- truth$infected[i]
-  out$onset <- truth$onset[i]
   
   class(out) <- c("sim_ctdata", class(out))
   out

@@ -139,3 +139,42 @@ test_that(
     
   }
 )
+
+test_that("process_infected() enforces a logical vector", {
+  expect_identical(process_infected(c(TRUE, FALSE, NA)), c(TRUE, FALSE, NA))
+  expect_identical(process_infected(NA), NA)                 # logical NA ok
+
+  msg <- "'infected' must be a logical vector"
+  expect_error(process_infected(c(0, 1)), msg)
+  expect_error(process_infected("TRUE"), msg)
+  expect_error(process_infected(factor("yes")), msg)
+})
+
+
+test_that("process_onset_infected() enforces onset => infected", {
+  ## consistent combinations pass
+  expect_true(process_onset_infected(onset = c(NA, NA), infected = c(TRUE, FALSE)))
+  expect_true(process_onset_infected(c(10, NA), c(TRUE, FALSE)))  
+  expect_true(process_onset_infected(NA, TRUE))
+
+  ## onset present without confirmed infection fails, and reports the rows
+  msg <- "onset implies infected = TRUE"
+  expect_error(process_onset_infected(c(NA, 5), c(TRUE, FALSE)), msg)  # FALSE
+  expect_error(process_onset_infected(5, NA), msg)                     # unknown status
+  expect_error(process_onset_infected(c(1, 2), c(FALSE, FALSE)), "1, 2")
+})
+
+
+test_that("process_extra_columns() validates optional inputs", {
+  expect_identical(process_extra_columns(list(), n_rows = 3), list())
+
+  d <- list(vaccinated = TRUE, age = c(10, 20, 30))          # length 1 and length n both ok
+  expect_identical(process_extra_columns(d, n_rows = 3), d)
+
+  expect_error(process_extra_columns(list(1), n_rows = 3), "must be named")
+  expect_error(process_extra_columns(setNames(list(1, 2), c("a", "")), n_rows = 3), "must be named")
+  expect_error(process_extra_columns(setNames(list(1, 2), c("a", "a")), n_rows = 3), "must be unique")
+  expect_error(process_extra_columns(list(score = 1), n_rows = 3), "clash with reserved")
+  expect_error(process_extra_columns(list(detection_date = 1), n_rows = 3), "clash with reserved")
+  expect_error(process_extra_columns(list(foo = c(1, 2)), n_rows = 3), "must be length 1 or 3")
+})

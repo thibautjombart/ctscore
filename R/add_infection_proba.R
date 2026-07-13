@@ -19,8 +19,8 @@ add_infection_proba <- function(x, proba) {
   stopifnot(inherits(x, "ctdata"))
   proba <- process_infection_proba(proba, x)
   
-  ## We append a column 'p_infection' indicating the probabilities of infection
+  ## We append a column 'infection_proba' indicating the probabilities of infection
   ## according to the type of exposure described in the column 'type'.´
-  x$p_infection <- unlist(proba[x$type])
+  x$infection_proba <- unlist(proba[x$type])
   x
 }

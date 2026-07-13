@@ -83,3 +83,68 @@ process_infection_proba <- function(proba, x) {
   }
   proba
 }
+
+
+#' Checks the infection status is a logical vector.
+#' NAs are allowed.
+#' @noRd
+process_infected <- function(x) {
+  if (!is.logical(x)) {
+    stop("'infected' must be a logical vector (TRUE/FALSE/NA)")
+  }
+  x
+}
+
+
+#' Checks that onset is consistent with infection status.
+#' A contact with a symptom onset date must be infected (TRUE).
+#' @noRd
+process_onset_infected <- function(onset, infected) {
+  #onset present and infection not confirmed.
+  bad <- !is.na(onset) & !(infected %in% TRUE)
+  if (any(bad)) {
+    msg <- sprintf(
+      "onset implies infected = TRUE, check rows: %s",
+      paste(which(bad), collapse = ", ")
+    )
+    stop(msg)
+  }
+  invisible(TRUE)
+}
+
+
+
+#' Validates optional user-supplied columns passed through `...`.
+#' Checks that they are named, do not overwrite reserved ctdata columns,
+#' and are either length 1 (recycled) or match the number of exposure rows.
+#' `reserved` lists columns added downstream by ctscore()/sim_followup(); the
+#' make_ctdata() formals are already protected by R's argument matching, so only
+#' these non-formal names can slip in through `...`.
+#' @noRd
+process_extra_columns <- function(dots, n_rows,
+                                  reserved = c("score", "detection_date")) {
+  if (length(dots) == 0L) return(dots)
+
+  nms <- names(dots)
+  if (is.null(nms) || any(!nzchar(nms))) {
+    msg <- "additional input(s) passed through '...' must be named"
+    stop(msg)
+  }
+  if (anyDuplicated(nms)) {
+    msg <- "additional input names passed through '...' must be unique"
+    stop(msg)
+  }
+  clash <- intersect(nms, reserved)
+  if (length(clash)>0) {
+    msg <- sprintf("additional input name(s) clash with reserved ctdata columns: %s",
+                   paste(clash, collapse = ", "))
+    stop(msg)
+  }
+  bad_len <- vapply(dots, function(col) !(length(col) %in% c(1L, n_rows)), logical(1))
+  if (any(bad_len)) {
+    msg <- sprintf("additional input(s) must be length 1 or %d: %s",
+                   n_rows, paste(nms[bad_len], collapse = ", "))
+    stop(msg)
+  }
+  dots
+}

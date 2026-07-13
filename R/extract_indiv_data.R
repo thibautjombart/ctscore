@@ -41,7 +41,7 @@ extract_indiv_data <- function(x) {
   }
  
   ## remove columns that are specific to exposures
-  to_remove <- names(x) %in% c("date", "type", "p_infection")
+  to_remove <- names(x) %in% c("date", "type", "infection_proba")
   out <- x[, !to_remove, drop = FALSE]
   
   ## keep only the first occurrence of each contact_id
