@@ -16,7 +16,7 @@
 #' @export
 #' 
 add_infection_proba <- function(x, proba) {
-  stopifnot(inherits(x, "ctdata"))
+  #stopifnot(inherits(x, "ctdata"))
   proba <- process_infection_proba(proba, x)
   
   ## We append a column 'infection_proba' indicating the probabilities of infection

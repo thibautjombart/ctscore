@@ -46,23 +46,34 @@ defaults to \code{NA}.}
 must match that of \code{date}; if the contact has not developed symptoms,
 this should be \code{NA}}
 
-\item{...}{additional named vectors to append as extra columns; each must be
-length 1 (recycled) or match the number of rows, and names must not clash
+\item{...}{additional named vectors to append as extra columns to the linelist;
+each must be length 1 (recycled) or the number of contacts, and names must not clash
 with existing columns}
 }
 \value{
-A \code{ctdata} object, which is a validated and ordered (by contact ID
-and date of exposure) \code{data.frame} designed to be used in the \link{ctscore}
-function.
+A \code{ctdata} object: a \code{list} of two tibbles sharing the a \code{contact_id} column:
+\itemize{
+\item \code{linelist}: one row per contact (\code{location}, \code{last_visit}, \code{infected},
+\code{onset}, plus any extra columns), ordered by \code{contact_id};
+\item \code{exposures}: one row per exposure (\code{date}, \code{type}, \code{infection_proba}),
+ordered by \code{contact_id} then \code{date}.
+}
 }
 \description{
 This constructor will build a \code{ctdata} object from different inputs
 describing past exposures and follow-up history for different individuals.
 }
+\details{
+Individual-level inputs (\code{location}, \code{last_visit}, \code{infected}, \code{onset} and any
+extra columns passed through \code{...}) describe the contact, not the exposure.
+They may be supplied per exposure row for convenience, but must be constant
+within a contact; \code{make_ctdata()} errors otherwise and stores a single value
+per contact in \code{linelist}.
+}
 \examples{
 
 x <- make_ctdata(
-  contact_id = c(1, 1, 2, 3), 
+  contact_id = c(1, 1, 2, 3),
   date = Sys.Date() - c(6, 4, 2, 2),
   type = c("normal", "funeral", "normal", "normal"),
   location = "some-town",
@@ -76,5 +87,5 @@ class(x)
 \code{\link[=sim_ctdata]{sim_ctdata()}} to simulate contact tracing data.
 }
 \author{
-Thibaut Jombart
+Thibaut Jombart / Cyril Geismar
 }
