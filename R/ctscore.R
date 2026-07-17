@@ -1,119 +1,93 @@
 #' Calculate contact tracing score
-#' 
+#'
 #' This function calculates the probability of detecting symptoms in a contact
-#' on a given day given their exposure and follow-up history, as described in 
+#' on a given day given their exposure and follow-up history, as described in
 #' Jombart et al. 2026.
-#' 
+#'
 #' @author Thibaut Jombart
 #' @export
-#' 
+#'
 #' @param x a `ctdata` object as returned by [make_ctdata()]
-#' 
-#' @param incub the incubation period distribution; can be provided as a vector 
-#'   of probabilities giving p(0 day), p(1 day), p(2 days) ... or as a 
+#'
+#' @param incub the incubation period distribution; can be provided as a vector
+#'   of probabilities giving p(0 day), p(1 day), p(2 days) ... or as a
 #'   `distcrete` object as returned by distcrete::distcrete()
-#'   
+#'
 #' @param current_date the current date, provided either as a `numeric` value or
 #'   as a `Date`; defaults to the current date as returned by `Sys.Date()`
-#'   
-#' @param out_type a `character` indicating the type of output to return; can be 
-#'   either "vector" (default) to return a named vector of scores, "data.frame" 
-#'   to return a data frame with contact IDs and scores, "ctdata" to return a
-#'   `ctdata` object with individual data and scores, or "ctdata_full" to append
-#'   scores to the original `ctdata` of exposure data
-#' 
-#' @return A named numeric vector giving the probability of detecting symptoms
-#'  for each contact, with names corresponding to the contact IDs.
-#'  
+#'
+#' @param out_type a `character` indicating the type of output to return:
+#'   "vector" (default) returns a named numeric vector of scores; "data.frame"
+#'   returns a tibble with `contact_id` and `score`; "ctdata" returns the input
+#'   `ctdata` object with a `score` column added to its `linelist`.
+#'
+#' @return By default (`out_type = "vector"`) a named numeric vector giving the
+#'   probability of detecting symptoms for each contact, named by contact ID.
+#'   See `out_type` for the other shapes.
+#'
 #' @examples
-#' ## make dummy contact tracing data
 #' x <- make_ctdata(
-#'   contact_id = c(1, 1, 2, 3, 4), 
-#'   date = Sys.Date() - c(6, 4, 5, 1, 5),
-#'   type = c("normal", "funeral", "normal", "normal", "null"),
-#'   location = "some-town",
-#'   infection_proba = list(normal = 0.2, funeral = 0.9, null = 0),
-#'   last_visit = Sys.Date() - c(4, 2, 1, 1, 3)
+#'   exposures = tibble::tibble(
+#'     contact_id = c(1, 1, 2, 3, 4),
+#'     date       = Sys.Date() - c(6, 4, 5, 1, 5),
+#'     type       = c("normal", "funeral", "normal", "normal", "null")
+#'   ),
+#'   linelist = tibble::tibble(
+#'     contact_id = c(1, 2, 3, 4),
+#'     last_visit = Sys.Date() - c(2, 1, 1, 3)
+#'   ),
+#'   infection_proba = list(normal = 0.2, funeral = 0.9, null = 0)
 #' )
-#' 
-#' ## make a dummy incubation time distribution, specifying the PMF from 0 to 
-#' ## 7 days here
+#'
+#' ## incubation time PMF from day 0 to 7
 #' incub <- c(0, 0, 1, 2, 4, 3, 2, 1)
-#' 
-#' ## get results
-#' res <- ctscore(x, incub)
-#' res
-#' 
-#' ## other useful shape for results: a ctdata object of individuals data with 
-#' ## scores appended
-#' res <- ctscore(x, incub, out_type = "ctdata")
-#' res
-#' 
-#' ## other example using `distcrete` to build the incubation time distribution
+#'
+#' ## default: a named vector of scores
+#' ctscore(x, incub)
+#'
+#' ## other shapes
+#' ctscore(x, incub, out_type = "data.frame")
+#' ctscore(x, incub, out_type = "ctdata")
+#'
+#' ## incubation as a distcrete object
 #' incub <- distcrete::distcrete("gamma", interval = 1, shape = 2, scale = 2.5, w = 0)
-#' res <- ctscore(x, incub)
-#' res
-#' 
-#' ## trying other output shapes
-#' ### data.frame with individual data
-#' res_df <- ctscore(x, incub, out_type = "data.frame")
-#' res_df
-#' 
-#' ### ctdata object of individuals with scores appended
-#' res_ctdata <- ctscore(x, incub, out_type = "ctdata")
-#' res_ctdata
-#' 
-#' 
-#' ### same, with all original exposure data
-#' res_ctdata_full <- ctscore(x, incub, out_type = "ctdata_full")
-#' res_ctdata_full
-
-ctscore <- function(
-    x, 
-    incub, 
-    current_date = Sys.Date(), 
-    out_type = c("vector", "data.frame", "ctdata", "ctdata_full")
-) {
-  
-  ## process inputs
+#' ctscore(x, incub)
+ctscore <- function(x,
+                    incub,
+                    current_date = Sys.Date(),
+                    out_type = c("vector", "data.frame", "ctdata")) {
   if (!inherits(x, "ctdata")) {
-    msg <- "'x' should be a ctdata object as returned by make_ctdata()"
-    stop(msg)
+    stop("'x' should be a ctdata object as returned by make_ctdata()",
+      call. = FALSE
+    )
   }
-  
   incub <- process_incub(incub)
   out_type <- match.arg(out_type)
-  
-  ## split the data.frame by contact ID and calculate the score for each contact
-  list_x <- split(x, x$contact_id)
-  
-  ## calculate the probability of infection
-  out <- vapply(
-    list_x, 
-    function(e) calculate_ctscore(p_inf = e$infection_proba, 
-                                  e = e$date, 
-                                  s = max(e$last_visit), 
-                                  t = current_date, 
-                                  incub = incub), 
-    numeric(1)
-  )
-  
-  ## shape result into desired output type
+
+  ## date of last asymptomatic visit, keyed by contact_id (one row per contact)
+  last_visit <- x$linelist$last_visit
+  names(last_visit) <- x$linelist$contact_id
+
+  ## score each contact from its exposures (dates ascending within a contact)
+  by_contact <- split(x$exposures, x$exposures$contact_id)
+  scores <- vapply(names(by_contact), function(id) {
+    e <- by_contact[[id]]
+    calculate_ctscore(
+      p_inf = e$infection_proba,
+      e = e$date,
+      s = last_visit[[id]],
+      t = current_date,
+      incub = incub
+    )
+  }, numeric(1))
+
+  ## scores are individual-level (one per contact) -> shape as requested
   if (out_type == "data.frame") {
-    out <- data.frame(contact_id = names(out), score = out)
-  } 
-  
-  if (out_type %in% c("ctdata", "ctdata_full")) {
-    out <- dplyr::left_join(
-      x, 
-      data.frame(contact_id = names(out),
-                 score = out), 
-      by = "contact_id")
+    return(tibble::tibble(contact_id = names(scores), score = unname(scores)))
   }
-  
   if (out_type == "ctdata") {
-    out <- extract_indiv_data(out)
+    x$linelist$score <- unname(scores[x$linelist$contact_id])
+    return(x)
   }
-  
-  out
+  scores
 }

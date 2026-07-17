@@ -17,13 +17,13 @@
 #' \dontrun{
 #' ## simulated data (also shows infection date and symptom onset)
 #' plot(sim_ctdata())
-#'
 #' }
 plot.ctdata <- function(x, ...) {
   if (!requireNamespace("ggplot2", quietly = TRUE)) {
     stop("Package 'ggplot2' is required to plot ctdata objects. ",
-         "Please install it with install.packages('ggplot2').",
-         call. = FALSE)
+      "Please install it with install.packages('ggplot2').",
+      call. = FALSE
+    )
   }
 
   x <- as.data.frame(x)
@@ -55,12 +55,14 @@ plot.ctdata <- function(x, ...) {
       ),
       colour = "grey80"
     ) +
-    ## exposures, coloured by type
+    ## exposures, filled by type
     ggplot2::geom_point(
       data = x,
       ggplot2::aes(
-        x = date, y = contact, colour = type
+        x = date, y = contact, fill = type
       ),
+      colour = "black",
+      pch = 21,
       size = 3
     ) +
     ## last visit (cross)
@@ -69,7 +71,7 @@ plot.ctdata <- function(x, ...) {
       ggplot2::aes(
         x = last_visit, y = contact, shape = "last visit"
       ),
-      size = 3
+      size = 2
     )
 
   ## symptom onset (triangle) (sim_ctdata only)
@@ -80,7 +82,7 @@ plot.ctdata <- function(x, ...) {
         ggplot2::aes(
           x = onset, y = contact, shape = "onset"
         ),
-        size = 3
+        size = 2
       )
   }
 
@@ -92,7 +94,7 @@ plot.ctdata <- function(x, ...) {
         ggplot2::aes(
           x = infection_date, y = contact, shape = "infection"
         ),
-        size = 3
+        size = 2
       )
   }
 

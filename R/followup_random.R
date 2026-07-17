@@ -14,9 +14,9 @@ is_eligible <- function(t, opens, closes, detection_date) {
 #' @author Cyril Geismar
 #'
 #' @keywords internal
-#' 
+#'
 #' @noRd
-#' 
+#'
 #' @importFrom stats rbinom
 #'
 #' @param x a `ctdata` object
@@ -56,11 +56,11 @@ is_eligible <- function(t, opens, closes, detection_date) {
     onset = x$onset[match(names(first_exp), x$contact_id)],
     ## @thibautjombart do we use the last_visit from x?
     last_visit = NA_real_,
-    #as.integer(x$last_visit[match(names(first_exp), x$contact_id)]),
+    # as.integer(x$last_visit[match(names(first_exp), x$contact_id)]),
     detection_date = NA_real_,
     stringsAsFactors = FALSE
   )
-  
+
   ## daily loop over the whole follow-up period: earliest opening -> latest closing
   for (t in seq.int(min(ct$opens), max(ct$closes))) {
     ## find eligible contacts
@@ -68,18 +68,18 @@ is_eligible <- function(t, opens, closes, detection_date) {
     if (length(eligible) == 0L) {
       next
     }
-    
+
     ## how many contacts visited today
     n_visited <- rbinom(1L, length(eligible), coverage)
     if (n_visited == 0L) {
       next
     }
-    
+
     ## who is visited (random)
     visited <- eligible[sample.int(length(eligible), n_visited)]
-    
+
     ## update: symptomatic at the visit -> record detection; otherwise seen asymptomatic
-    
+
     ## who is showing symptoms today?
     symptomatic <- !is.na(ct$onset[visited]) & t >= ct$onset[visited]
     ## symptomatic visit → record a detection
@@ -87,7 +87,7 @@ is_eligible <- function(t, opens, closes, detection_date) {
     ## asymptomatic visit → record a last visit
     ct$last_visit[visited[!symptomatic]] <- t
   }
-  
+
   ## write per-contact follow-up history back onto the exposure rows
   i <- match(x$contact_id, ct$contact_id)
   x$last_visit <- ct$last_visit[i]

@@ -8,7 +8,7 @@ ctscore(
   x,
   incub,
   current_date = Sys.Date(),
-  out_type = c("vector", "data.frame", "ctdata", "ctdata_full")
+  out_type = c("vector", "data.frame", "ctdata")
 )
 }
 \arguments{
@@ -21,15 +21,15 @@ of probabilities giving p(0 day), p(1 day), p(2 days) ... or as a
 \item{current_date}{the current date, provided either as a \code{numeric} value or
 as a \code{Date}; defaults to the current date as returned by \code{Sys.Date()}}
 
-\item{out_type}{a \code{character} indicating the type of output to return; can be
-either "vector" (default) to return a named vector of scores, "data.frame"
-to return a data frame with contact IDs and scores, "ctdata" to return a
-\code{ctdata} object with individual data and scores, or "ctdata_full" to append
-scores to the original \code{ctdata} of exposure data}
+\item{out_type}{a \code{character} indicating the type of output to return:
+"vector" (default) returns a named numeric vector of scores; "data.frame"
+returns a tibble with \code{contact_id} and \code{score}; "ctdata" returns the input
+\code{ctdata} object with a \code{score} column added to its \code{linelist}.}
 }
 \value{
-A named numeric vector giving the probability of detecting symptoms
-for each contact, with names corresponding to the contact IDs.
+By default (\code{out_type = "vector"}) a named numeric vector giving the
+probability of detecting symptoms for each contact, named by contact ID.
+See \code{out_type} for the other shapes.
 }
 \description{
 This function calculates the probability of detecting symptoms in a contact
@@ -37,47 +37,32 @@ on a given day given their exposure and follow-up history, as described in
 Jombart et al. 2026.
 }
 \examples{
-## make dummy contact tracing data
 x <- make_ctdata(
-  contact_id = c(1, 1, 2, 3, 4), 
-  date = Sys.Date() - c(6, 4, 5, 1, 5),
-  type = c("normal", "funeral", "normal", "normal", "null"),
-  location = "some-town",
-  infection_proba = list(normal = 0.2, funeral = 0.9, null = 0),
-  last_visit = Sys.Date() - c(4, 2, 1, 1, 3)
+  exposures = tibble::tibble(
+    contact_id = c(1, 1, 2, 3, 4),
+    date       = Sys.Date() - c(6, 4, 5, 1, 5),
+    type       = c("normal", "funeral", "normal", "normal", "null")
+  ),
+  linelist = tibble::tibble(
+    contact_id = c(1, 2, 3, 4),
+    last_visit = Sys.Date() - c(2, 1, 1, 3)
+  ),
+  infection_proba = list(normal = 0.2, funeral = 0.9, null = 0)
 )
 
-## make a dummy incubation time distribution, specifying the PMF from 0 to 
-## 7 days here
+## incubation time PMF from day 0 to 7
 incub <- c(0, 0, 1, 2, 4, 3, 2, 1)
 
-## get results
-res <- ctscore(x, incub)
-res
+## default: a named vector of scores
+ctscore(x, incub)
 
-## other useful shape for results: a ctdata object of individuals data with 
-## scores appended
-res <- ctscore(x, incub, out_type = "ctdata")
-res
+## other shapes
+ctscore(x, incub, out_type = "data.frame")
+ctscore(x, incub, out_type = "ctdata")
 
-## other example using `distcrete` to build the incubation time distribution
+## incubation as a distcrete object
 incub <- distcrete::distcrete("gamma", interval = 1, shape = 2, scale = 2.5, w = 0)
-res <- ctscore(x, incub)
-res
-
-## trying other output shapes
-### data.frame with individual data
-res_df <- ctscore(x, incub, out_type = "data.frame")
-res_df
-
-### ctdata object of individuals with scores appended
-res_ctdata <- ctscore(x, incub, out_type = "ctdata")
-res_ctdata
-
-
-### same, with all original exposure data
-res_ctdata_full <- ctscore(x, incub, out_type = "ctdata_full")
-res_ctdata_full
+ctscore(x, incub)
 }
 \author{
 Thibaut Jombart

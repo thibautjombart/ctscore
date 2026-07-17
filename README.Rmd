@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.path = "man/figures/README-",
-  out.width = "100%", 
+  out.width = "100%",
   dpi = 300
 )
 ```
@@ -41,15 +41,14 @@ library(tibble)
 library(dplyr)
 library(ggplot2)
 
-## use the path to your own file in practice 
+## use the path to your own file in practice
 path_to_file <- system.file("toy_ctdata.xlsx", package = "ctscore")
 
 ## read the data in
-raw_data <- rio::import(path_to_file) %>% 
+raw_data <- rio::import(path_to_file) %>%
   tibble()
 
 raw_data
-
 ```
 
 Each row corresponds to a reported exposure. The file contains the following information:
@@ -90,19 +89,19 @@ Next, we need to specify incubation time distribution, which can be provided eit
 
 ```{r}
 incub <- distcrete::distcrete(
-  "gamma", 
-  interval = 1, 
-  shape = 3.5, 
+  "gamma",
+  interval = 1,
+  shape = 3.5,
   scale = 2.5, w = 0
 )
 plot(
-  incub$d(0:30), type = "h", lwd = 6, lend = 1, 
-  xlab = "Days since infection", 
+  incub$d(0:30),
+  type = "h", lwd = 6, lend = 1,
+  xlab = "Days since infection",
   ylab = "Probability of symptom onset",
   main = "Incubation time distribution",
   col = 2
 )
-
 ```
 
 We can now calculate the `ctscore` using the `ctscore()` function, the current date is day 31 (again, this could be a real date in practice, in YYYY-MM-DD format):
@@ -128,29 +127,29 @@ appended to the exposure database
 
 ```{r}
 ## `ctdata` with individual info and  scores, sorted by score
-res <- ctscore(x, incub, current_date = 31, out_type = "ctdata") %>% 
-    arrange(desc(score))
+res <- ctscore(x, incub, current_date = 31, out_type = "ctdata") %>%
+  arrange(desc(score))
 head(res)
 
 ## ctdata object with scores appended, sorted by score
-res_full <- ctscore(x, incub, current_date = 31, out_type = "ctdata_full") %>% 
+res_full <- ctscore(x, incub, current_date = 31, out_type = "ctdata_full") %>%
   arrange(desc(score))
-
 ```
 
 We can use a simple plot to visualise the scores for each contact, which can be useful for prioritising visits:
 
 ```{r}
-
 ## some wrangling needed to keep the order of contacts in the plot
-res %>% 
-  mutate(contact_id = factor(contact_id, levels = unique(contact_id))) %>% 
-ggplot(aes(x = score, y = contact_id)) + 
-  geom_col() + 
-  theme_bw() + 
-  labs(x = "ctscore (probability of detecting symptoms)", 
-       y = "Contact ID", 
-       title = "Contact tracing scoring")
+res %>%
+  mutate(contact_id = factor(contact_id, levels = unique(contact_id))) %>%
+  ggplot(aes(x = score, y = contact_id)) +
+  geom_col() +
+  theme_bw() +
+  labs(
+    x = "ctscore (probability of detecting symptoms)",
+    y = "Contact ID",
+    title = "Contact tracing scoring"
+  )
 ```
 
 

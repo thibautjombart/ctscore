@@ -1,40 +1,25 @@
-# Make ctdata a list of 2 data.frames :
-
-# $exposures: exposure data
-# $linelist: data on individuals
-# use tibbles as we'll need to record vectors of dates of visits in followup simulations
+# Show that ctscore changes with last_visit dates.
+# (exposures must be old enough that symptom onset could plausibly have happened)
 
 devtools::load_all()
-x <- make_ctdata(
-  contact_id = c(1, 1, 2, 3),
-  date = Sys.Date() - c(6, 4, 2, 2),
-  type = c("normal", "funeral", "normal", "normal"),
-  location = "some-town",
-  infection_proba = list(normal = 0.2, funeral = 0.9),
-  last_visit = Sys.Date() - c(4, 4, 1, NA)
+library(tibble)
+
+# 3 contacts, each with one exposure ~7 days ago
+exposures <- tibble(
+  contact_id = c(1, 2, 3),
+  date       = Sys.Date() - c(7, 6, 8),
+  type       = c("normal", "funeral", "normal")
 )
-x
-class(x)
-contact_id <- c(1, 1, 2, 3)
-date <- Sys.Date() - c(6, 4, 2, 2)
-type <- c("normal", "funeral", "normal", "normal")
-location <- "some-town"
-infection_proba <- list(normal = 0.2, funeral = 0.9)
-last_visit <- Sys.Date() - c(4, 4, 1, NA)
-infected <- NA
-onset <- NA_real_
-vaccinated <- c(TRUE, FALSE, FALSE)
 
+# Gamma with a mean of 5.5
+incub <- distcrete::distcrete("gamma", interval = 1, shape = 3, scale = 2, w = 0)
 
-# make_ctdata(
-#   exposures,                       # contact_id, date, type (+ any extra exposure cols)
-#   linelist = NULL,                 # contact_id, location, last_visit, infected, onset (+ extras)
-#                                    #   default: one NA-filled row per contact_id in exposures
-#   infection_proba = list(default = 0)
-# )
+# same exposures, two different last_visit histories
+linelistA <- tibble(contact_id = c(1, 2, 3), last_visit = as.Date(NA))     # never visited
+linelistB <- tibble(contact_id = c(1, 2, 3), last_visit = Sys.Date() - 1)  # seen yesterday
 
-# # minimal (linelist auto-derived, all-NA):
-# make_ctdata(
-#   exposures = tibble(contact_id = c(1,1,2,3), date = ..., type = ...),
-#   infection_proba = list(normal = 0.2, funeral = 0.9)
-# )
+A <- make_ctdata(exposures, linelistA, infection_proba = list(normal = 0.2, funeral = 0.9))
+B <- make_ctdata(exposures, linelistB, infection_proba = list(normal = 0.2, funeral = 0.9))
+
+ctscore(A, incub)   # never visited  -> higher
+ctscore(B, incub)   # seen yesterday -> lower

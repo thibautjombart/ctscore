@@ -1,38 +1,32 @@
 test_that(
-  "Constructor issues correct errors", 
+  "Constructor issues correct errors",
   {
     msg <- 'argument "contact_id" is missing, with no default'
     expect_error(make_ctdata(), msg)
-    
+
     msg <- 'argument "date" is missing, with no default'
     expect_error(make_ctdata(contact_id = 1), msg)
-      
   }
 )
-
-
 
 
 test_that(
-  "Constructor works with basic input", 
+  "Constructor works with basic input",
   {
-  res <- make_ctdata(contact_id = "toto", date = Sys.Date())
-  expect_identical(
-    dim(res),
-    c(1L, 8L)
-  )
-  expect_identical(
-    names(res),
-    c("contact_id", "date", "type", "location", "last_visit", "infected", "onset", "infection_proba")
-  )
-  
-  expect_true(inherits(res, "ctdata"))
-  expect_true(inherits(res, "data.frame"))
-  
+    res <- make_ctdata(contact_id = "toto", date = Sys.Date())
+    expect_identical(
+      dim(res),
+      c(1L, 8L)
+    )
+    expect_identical(
+      names(res),
+      c("contact_id", "date", "type", "location", "last_visit", "infected", "onset", "infection_proba")
+    )
+
+    expect_true(inherits(res, "ctdata"))
+    expect_true(inherits(res, "data.frame"))
   }
 )
-
-
 
 
 test_that(
@@ -44,14 +38,14 @@ test_that(
     location <- factor("town")
     date_txt <- as.character(date)
     res <- make_ctdata(
-      contact_id = id, 
-      date = date_txt, 
-      type = type, 
-      location = location, 
+      contact_id = id,
+      date = date_txt,
+      type = type,
+      location = location,
       infection_proba = list(normal = 0.1, funeral = 0.5),
       last_visit = date_txt
     )
-    
+
     expect_true(inherits(res, "ctdata"))
     expect_true(inherits(res, "data.frame"))
     expect_identical(res$contact_id, as.character(id))
@@ -60,10 +54,8 @@ test_that(
     expect_identical(res$location, rep("town", 3))
     expect_equal(res$infection_proba, c(0.5, 0.1, 0.5))
     expect_identical(res$date, res$last_visit)
-    
-  } 
+  }
 )
-
 
 
 test_that(
@@ -75,14 +67,14 @@ test_that(
     location <- factor("town")
     date_txt <- as.character(date)
     res <- make_ctdata(
-      contact_id = id, 
-      date = date_txt, 
-      type = type, 
-      location = location, 
+      contact_id = id,
+      date = date_txt,
+      type = type,
+      location = location,
       infection_proba = list(normal = 0.1, funeral = 0.5),
-      last_visit = c(as.Date(NA), as.Date(NA), as.Date("2026-06-19")- 1)
+      last_visit = c(as.Date(NA), as.Date(NA), as.Date("2026-06-19") - 1)
     )
-    
+
     expect_true(inherits(res, "ctdata"))
     expect_true(inherits(res, "data.frame"))
     expect_identical(res$contact_id, as.character(id))
@@ -97,17 +89,21 @@ test_that(
 
 test_that("make_ctdata() rejects an onset without infection", {
   expect_error(
-    make_ctdata(contact_id = 1, date = Sys.Date(),
-                infected = FALSE, onset = Sys.Date()),
+    make_ctdata(
+      contact_id = 1, date = Sys.Date(),
+      infected = FALSE, onset = Sys.Date()
+    ),
     "onset implies infected = TRUE"
   )
 })
 
 test_that("make_ctdata() appends and recycles extra columns via ...", {
-  res <- make_ctdata(contact_id = c(1, 2), date = Sys.Date() - c(2, 2),
-                     vaccinated = c(TRUE, FALSE), ward = "A")
+  res <- make_ctdata(
+    contact_id = c(1, 2), date = Sys.Date() - c(2, 2),
+    vaccinated = c(TRUE, FALSE), ward = "A"
+  )
   expect_true(all(c("vaccinated", "ward") %in% names(res)))
-  expect_identical(res$ward, c("A", "A"))          # length-1 recycled
+  expect_identical(res$ward, c("A", "A")) # length-1 recycled
 })
 
 test_that("make_ctdata() rejects a duplicated formal argument", {
