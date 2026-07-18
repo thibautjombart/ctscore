@@ -16,14 +16,11 @@
 #' @param current_date the current date, provided either as a `numeric` value or
 #'   as a `Date`; defaults to the current date as returned by `Sys.Date()`
 #'
-#' @param out_type a `character` indicating the type of output to return:
-#'   "vector" (default) returns a named numeric vector of scores; "data.frame"
-#'   returns a tibble with `contact_id` and `score`; "ctdata" returns the input
-#'   `ctdata` object with a `score` column added to its `linelist`.
+#' @return A named numeric vector giving the probability of detecting symptoms
+#'   for each contact, named by contact ID. Use [add_ctscore()] to attach these
+#'   scores to the `linelist` of the source `ctdata`.
 #'
-#' @return By default (`out_type = "vector"`) a named numeric vector giving the
-#'   probability of detecting symptoms for each contact, named by contact ID.
-#'   See `out_type` for the other shapes.
+#' @seealso [add_ctscore()] to attach the scores back onto the `ctdata`.
 #'
 #' @examples
 #' x <- make_ctdata(
@@ -42,27 +39,25 @@
 #' ## incubation time PMF from day 0 to 7
 #' incub <- c(0, 0, 1, 2, 4, 3, 2, 1)
 #'
-#' ## default: a named vector of scores
-#' ctscore(x, incub)
+#' ## a named vector of scores
+#' score <- ctscore(x, incub)
+#' score
 #'
-#' ## other shapes
-#' ctscore(x, incub, out_type = "data.frame")
-#' ctscore(x, incub, out_type = "ctdata")
+#' ## attach the scores to the ctdata linelist
+#' add_ctscore(x, score)
 #'
 #' ## incubation as a distcrete object
 #' incub <- distcrete::distcrete("gamma", interval = 1, shape = 2, scale = 2.5, w = 0)
 #' ctscore(x, incub)
 ctscore <- function(x,
                     incub,
-                    current_date = Sys.Date(),
-                    out_type = c("vector", "data.frame", "ctdata")) {
+                    current_date = Sys.Date()) {
   if (!inherits(x, "ctdata")) {
     stop("'x' should be a ctdata object as returned by make_ctdata()",
       call. = FALSE
     )
   }
   incub <- process_incub(incub)
-  out_type <- match.arg(out_type)
 
   ## date of last asymptomatic visit, keyed by contact_id (one row per contact)
   last_visit <- x$linelist$last_visit
@@ -70,7 +65,7 @@ ctscore <- function(x,
 
   ## score each contact from its exposures (dates ascending within a contact)
   by_contact <- split(x$exposures, x$exposures$contact_id)
-  scores <- vapply(names(by_contact), function(id) {
+  vapply(names(by_contact), function(id) {
     e <- by_contact[[id]]
     calculate_ctscore(
       p_inf = e$infection_proba,
@@ -80,14 +75,24 @@ ctscore <- function(x,
       incub = incub
     )
   }, numeric(1))
+}
 
-  ## scores are individual-level (one per contact) -> shape as requested
-  if (out_type == "data.frame") {
-    return(tibble::tibble(contact_id = names(scores), score = unname(scores)))
-  }
-  if (out_type == "ctdata") {
-    x$linelist$score <- unname(scores[x$linelist$contact_id])
-    return(x)
-  }
-  scores
+
+#' Attach ctscores to a ctdata linelist
+#'
+#' Adds the per-contact scores returned by [ctscore()] as a `score` column of the
+#' `ctdata`'s `linelist`, matched by `contact_id`.
+#'
+#' @param x the `ctdata` object to which the scores should be added
+#' @param score a named numeric vector of scores as returned by [ctscore()]
+#'
+#' @return The `ctdata` object `x`, with a `score` column added to its
+#'   `linelist`.
+#'
+#' @seealso [ctscore()]
+#'
+#' @export
+add_ctscore <- function(x, score) {
+  x$linelist$score <- unname(score[as.character(x$linelist$contact_id)])
+  x
 }

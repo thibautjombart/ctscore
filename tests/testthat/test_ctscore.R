@@ -103,7 +103,7 @@ test_that(
 
 
 test_that(
-  "ctscore() shapes results correctly",
+  "add_ctscore() appends scores to the linelist",
   {
     x <- make_x()
 
@@ -112,28 +112,19 @@ test_that(
       interval = 1, shape = 3.123, scale = 2.5, w = 0
     )
 
-    res_1 <- ctscore(x, incub)
-    res_2 <- ctscore(x, incub, out_type = "data.frame")
-    res_3 <- ctscore(x, incub, out_type = "ctdata")
+    score <- ctscore(x, incub)
+    expect_true(is.numeric(score))
 
-    expect_true(is.numeric(res_1))
-    expect_s3_class(res_2, "data.frame")
-    expect_s3_class(res_3, "ctdata")
+    res <- add_ctscore(x, score)
+    expect_s3_class(res, "ctdata")
+    expect_identical(names(res), c("linelist", "exposures"))
+    expect_true("score" %in% names(res$linelist))
+    expect_identical(res$exposures, x$exposures)
 
-    ## scores agree across shapes
-    expect_equal(unname(res_1), res_2$score)
-    expect_equal(unname(res_1), res_3$linelist$score)
-
-    ## data.frame shape
-    expect_identical(names(res_2), c("contact_id", "score"))
-
-    ## ctdata shape: score appended to the linelist, object otherwise intact
-    expect_identical(names(res_3), c("linelist", "exposures"))
-    expect_setequal(
-      names(res_3$linelist),
-      c("contact_id", "location", "last_visit", "infected", "onset", "score")
+    ## score matched to the right contact
+    expect_equal(
+      res$linelist$score,
+      unname(score[as.character(res$linelist$contact_id)])
     )
-    expect_identical(names(res_3$linelist)[ncol(res_3$linelist)], "score")
-    expect_identical(res_3$exposures, x$exposures)
   }
 )

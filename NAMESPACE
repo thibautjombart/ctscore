@@ -3,6 +3,7 @@
 S3method(as.data.frame,ctdata)
 S3method(plot,ctdata)
 S3method(print,ctdata)
+export(add_ctscore)
 export(add_infection_proba)
 export(ctscore)
 export(make_ctdata)
