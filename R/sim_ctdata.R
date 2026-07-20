@@ -133,7 +133,7 @@ sim_ctdata <- function(n_contacts = 100,
       location = l,
       infected = infected,
       infection_date = t_inf,
-      onset = t_ons,
+      onset_date = t_ons,
       stringsAsFactors = FALSE
     )
   }
@@ -144,7 +144,7 @@ sim_ctdata <- function(n_contacts = 100,
     exposures = ct[c("contact_id", "date", "type")],
     linelist = unique(ct[c(
       "contact_id", "location",
-      "infected", "infection_date", "onset"
+      "infected", "infection_date", "onset_date"
     )]),
     infection_proba = infection_proba[unique(ct$type)]
   )

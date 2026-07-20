@@ -2,7 +2,7 @@
 #'
 #' A `ctdata` object is a `list` of two tibbles sharing a `contact_id` column:
 #' - `linelist`: one row per contact (individual-level data such as `location`,
-#'   `last_visit`, `infected`, `onset`, plus any extra columns).
+#'   `last_visit_date`, `infected`, `onset_date`, plus any extra columns).
 #' - `exposures`: one row per exposure (`date`, `type`, `infection_proba`).
 #'
 #' @author Cyril Geismar
@@ -42,9 +42,9 @@ tibble::as_tibble
 #' @param ... ignored
 #'
 #' @return A tibble.
-#' 
+#'
 #' @exportS3Method tibble::as_tibble
-#' 
+#'
 #' @examples
 #' x <- sim_ctdata(5)
 #' as_tibble(x) # flat: one row per exposure

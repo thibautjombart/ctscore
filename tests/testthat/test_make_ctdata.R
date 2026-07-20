@@ -26,7 +26,7 @@ test_that("make_ctdata() builds a two-table ctdata (linelist derived from exposu
 
   ## with no linelist, one all-NA row per contact is derived
   expect_identical(x$linelist$contact_id, "1")
-  expect_identical(names(x$linelist), c("contact_id", "location", "last_visit", "infected", "onset"))
+  expect_identical(names(x$linelist), c("contact_id", "location", "last_visit_date", "infected", "onset_date"))
   expect_true(all(is.na(x$linelist[, -1])))
 })
 
@@ -53,13 +53,13 @@ test_that("make_ctdata() validates and keeps a supplied linelist", {
     exposures = tibble::tibble(contact_id = c(1, 2), date = Sys.Date(), type = "normal"),
     linelist = tibble::tibble(
       contact_id = c(1, 2),
-      last_visit = c(as.Date(NA), as.Date("2026-06-18")),
+      last_visit_date = c(as.Date(NA), as.Date("2026-06-18")),
       ward       = "A" # extra column, recycled and kept
     ),
     infection_proba = list(normal = 0.2)
   )
   expect_identical(x$linelist$contact_id, c("1", "2"))
-  expect_identical(x$linelist$last_visit, c(as.Date(NA), as.Date("2026-06-18"))) # NA preserved
+  expect_identical(x$linelist$last_visit_date, c(as.Date(NA), as.Date("2026-06-18"))) # NA preserved
   expect_identical(x$linelist$ward, c("A", "A"))
 })
 
@@ -68,9 +68,9 @@ test_that("make_ctdata() rejects an onset without infection", {
   expect_error(
     make_ctdata(
       exposures = tibble::tibble(contact_id = 1, date = Sys.Date(), type = "normal"),
-      linelist = tibble::tibble(contact_id = 1, infected = FALSE, onset = Sys.Date()),
+      linelist = tibble::tibble(contact_id = 1, infected = FALSE, onset_date = Sys.Date()),
       infection_proba = list(normal = 0.2)
     ),
-    "onset implies infected = TRUE"
+    "onset_date implies infected = TRUE"
   )
 })

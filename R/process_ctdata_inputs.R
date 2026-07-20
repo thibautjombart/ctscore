@@ -100,12 +100,12 @@ process_infected <- function(x) {
 #' inconsistency.
 #' @noRd
 process_onset_infected <- function(linelist) {
-  ## onset present but infection not confirmed (TRUE)
-  bad <- !is.na(linelist$onset) & !(linelist$infected %in% TRUE)
+  ## onset_date present but infection not confirmed (TRUE)
+  bad <- !is.na(linelist$onset_date) & !(linelist$infected %in% TRUE)
   if (any(bad)) {
     stop(
       sprintf(
-        "onset implies infected = TRUE, check contact(s): %s",
+        "onset_date implies infected = TRUE, check contact(s): %s",
         paste(linelist$contact_id[bad], collapse = ", ")
       ),
       call. = FALSE
@@ -149,8 +149,8 @@ process_exposures <- function(exposures) {
 #' When `linelist` is `NULL`, an all-`NA` linelist is derived from the contact
 #' ids found in `exposures`. Otherwise the supplied table is validated (a data
 #' frame keyed by a unique `contact_id` covering every exposed contact) and
-#' coerced. The recognised individual columns (`location`, `last_visit`,
-#' `infected`, `onset`) are filled with `NA` when absent; extra columns are kept.
+#' coerced. The recognised individual columns (`location`, `last_visit_date`,
+#' `infected`, `onset_date`) are filled with `NA` when absent; extra columns are kept.
 #' @noRd
 process_linelist <- function(linelist, exposures) {
   ids <- unique(exposures$contact_id)
@@ -183,19 +183,19 @@ process_linelist <- function(linelist, exposures) {
   ## ensure the recognised individual columns exist (fill NA), then coerce
   na_day <- if (inherits(exposures$date, "Date")) as.Date(NA) else NA_real_
   if (!"location" %in% names(linelist)) linelist$location <- NA_character_
-  if (!"last_visit" %in% names(linelist)) linelist$last_visit <- na_day
+  if (!"last_visit_date" %in% names(linelist)) linelist$last_visit_date <- na_day
   if (!"infected" %in% names(linelist)) linelist$infected <- NA
-  if (!"onset" %in% names(linelist)) linelist$onset <- na_day
+  if (!"onset_date" %in% names(linelist)) linelist$onset_date <- na_day
   linelist$location <- process_location(linelist$location)
-  linelist$last_visit <- process_date(linelist$last_visit, na_ok = TRUE)
+  linelist$last_visit_date <- process_date(linelist$last_visit_date, na_ok = TRUE)
   linelist$infected <- process_infected(linelist$infected)
-  linelist$onset <- process_date(linelist$onset, na_ok = TRUE)
+  linelist$onset_date <- process_date(linelist$onset_date, na_ok = TRUE)
 
   ## a symptom onset date implies the contact is infected
   linelist <- process_onset_infected(linelist)
 
   ## stable column order: recognised columns first, then any extras
-  recognised <- c("contact_id", "location", "last_visit", "infected", "onset")
+  recognised <- c("contact_id", "location", "last_visit_date", "infected", "onset_date")
   linelist <- linelist[c(recognised, setdiff(names(linelist), recognised))]
 
   dplyr::arrange(linelist, contact_id)

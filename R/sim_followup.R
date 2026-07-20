@@ -34,7 +34,7 @@
 #'   simulations; currently available values are: "random"; see details section
 #'   for more information
 #'
-#' @return `x` with columns `last_visit` and `detection_date` updated according to the follow-up strategy.
+#' @return `x` with columns `last_visit_date` and `detection_date` updated according to the follow-up strategy.
 #'
 #' @details
 #' Available follow-up strategies (`strategy` argument) include:

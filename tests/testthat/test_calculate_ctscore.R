@@ -82,7 +82,7 @@ test_that(
 
 
 test_that(
-  "calculate_ctscore() works when last_visit is NA",
+  "calculate_ctscore() works when last_visit_date is NA",
   {
     res_1 <- calculate_ctscore(
       p_inf = c(0.1, 0.9, 0.1),

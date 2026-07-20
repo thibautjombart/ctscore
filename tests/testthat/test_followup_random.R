@@ -2,7 +2,7 @@ test_that("random follow-up with coverage = 0 records nothing", {
   x <- sim_ctdata(10)
   y <- sim_followup(x, coverage = 0, strategy = "random")
 
-  expect_true(all(is.na(y$linelist$last_visit)))
+  expect_true(all(is.na(y$linelist$last_visit_date)))
   expect_true(all(is.na(y$linelist$detection_date)))
 })
 
@@ -17,7 +17,7 @@ test_that("random follow-up detects a symptomatic contact within its window", {
     linelist = tibble::tibble(
       contact_id = c("A", "B"),
       infected   = c(TRUE, FALSE),
-      onset      = c(12, NA)
+      onset_date = c(12, NA)
     ),
     infection_proba = list(exposure = 0.5)
   )
@@ -36,9 +36,9 @@ test_that("random follow-up detects a symptomatic contact within its window", {
   ## A: window [11, 31]; seen asymptomatic on 11, detected on onset day 12
   expect_false(is.na(a$detection_date))
   expect_equal(a$detection_date, 12)
-  expect_equal(a$last_visit, 11)
+  expect_equal(a$last_visit_date, 11)
 
   ## B: never symptomatic; visited to end of window, never detected
   expect_true(is.na(b$detection_date))
-  expect_equal(b$last_visit, 31)
+  expect_equal(b$last_visit_date, 31)
 })

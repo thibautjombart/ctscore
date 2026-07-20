@@ -7,7 +7,7 @@
 A \code{ctdata} object is a \code{list} of two tibbles sharing a \code{contact_id} column:
 \itemize{
 \item \code{linelist}: one row per contact (individual-level data such as \code{location},
-\code{last_visit}, \code{infected}, \code{onset}, plus any extra columns).
+\code{last_visit_date}, \code{infected}, \code{onset_date}, plus any extra columns).
 \item \code{exposures}: one row per exposure (\code{date}, \code{type}, \code{infection_proba}).
 }
 }

@@ -8,7 +8,7 @@ make_x <- function() {
     ),
     linelist = tibble::tibble(
       contact_id = c(1, 2, 3, 4),
-      last_visit = Sys.Date() - c(2, 1, 1, 3)
+      last_visit_date = Sys.Date() - c(2, 1, 1, 3)
     ),
     infection_proba = list(normal = 0.2, funeral = 0.9, null = 0)
   )
@@ -73,7 +73,7 @@ test_that(
 
 
 test_that(
-  "ctscore() handles NA in last_visit correctly",
+  "ctscore() handles NA in last_visit_date correctly",
   {
     incub <- distcrete::distcrete("gamma", interval = 1, shape = 2, scale = 2.5, w = 0)
 
@@ -85,14 +85,14 @@ test_that(
       ),
       linelist = tibble::tibble(
         contact_id = c("a", "b", "c", "d"),
-        last_visit = Sys.Date() - c(4, NA, NA, NA)
+        last_visit_date = Sys.Date() - c(4, NA, NA, NA)
       ),
       infection_proba = list(normal = 0.2, funeral = 0.9, null = 0)
     )
 
-    ## a very old last_visit is equivalent to never having been seen
+    ## a very old last_visit_date is equivalent to never having been seen
     x_2 <- x_1
-    x_2$linelist$last_visit[2:4] <- as.Date("2000-12-02")
+    x_2$linelist$last_visit_date[2:4] <- as.Date("2000-12-02")
 
     expect_identical(
       ctscore(x_1, incub),

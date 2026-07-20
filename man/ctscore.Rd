@@ -35,7 +35,7 @@ x <- make_ctdata(
   ),
   linelist = tibble::tibble(
     contact_id = c(1, 2, 3, 4),
-    last_visit = Sys.Date() - c(2, 1, 1, 3)
+    last_visit_date = Sys.Date() - c(2, 1, 1, 3)
   ),
   infection_proba = list(normal = 0.2, funeral = 0.9, null = 0)
 )

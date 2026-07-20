@@ -80,16 +80,16 @@ test_that("infection status and onset are internally consistent", {
   ## at least one contact is infected under the default probability
   expect_true(any(ll$infected))
 
-  ## onset is recorded exactly for infected contacts
-  expect_false(all(is.na(ll$onset[ll$infected])))
-  expect_true(all(is.na(ll$onset[!ll$infected])))
+  ## onset_date is recorded exactly for infected contacts
+  expect_false(all(is.na(ll$onset_date[ll$infected])))
+  expect_true(all(is.na(ll$onset_date[!ll$infected])))
 
-  ## infection_date follows the same NA pattern as onset
+  ## infection_date follows the same NA pattern as onset_date
   expect_true(all(is.na(ll$infection_date[!ll$infected])))
   expect_false(all(is.na(ll$infection_date[ll$infected])))
 
-  ## onset is on/after the infection date
-  expect_true(all(ll$onset[ll$infected] >= ll$infection_date[ll$infected]))
+  ## onset_date is on/after the infection date
+  expect_true(all(ll$onset_date[ll$infected] >= ll$infection_date[ll$infected]))
 
   ## no infection (and no onset) when the probability is zero
   sim0 <- sim_ctdata(
@@ -97,7 +97,7 @@ test_that("infection status and onset are internally consistent", {
     infection_proba = list(default = 0)
   )
   expect_false(any(sim0$linelist$infected))
-  expect_true(all(is.na(sim0$linelist$onset)))
+  expect_true(all(is.na(sim0$linelist$onset_date)))
   expect_true(all(is.na(sim0$linelist$infection_date)))
 })
 
@@ -182,7 +182,7 @@ test_that("sim_ctdata returns a ctdata usable by ctscore", {
   ## check class and required columns
   expect_s3_class(sim, "ctdata")
   expect_true("infection_proba" %in% names(sim$exposures))
-  expect_true(all(c("infected", "infection_date", "onset") %in% names(sim$linelist)))
+  expect_true(all(c("infected", "infection_date", "onset_date") %in% names(sim$linelist)))
 
 
   sc <- ctscore(sim,

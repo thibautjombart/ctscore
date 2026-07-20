@@ -14,9 +14,9 @@
 #'   with `as.Date`).
 #'
 #' @param linelist an optional `data.frame` of individual-level data.
-#'   Must contain `contact_id` and may contain `location`, `last_visit`, `infected`,
-#'   `onset`, plus any extra columns.
-#'   `last_visit` and `onset` may be `Date` or numeric.
+#'   Must contain `contact_id` and may contain `location`, `last_visit_date`, `infected`,
+#'   `onset_date`, plus any extra columns.
+#'   `last_visit_date` and `onset_date` may be `Date` or numeric.
 #'
 #' @param infection_proba a named `list` giving the probability of infection for
 #'   each exposure `type`; names must match the types present in `exposures`.
@@ -37,7 +37,7 @@
 #'   linelist = tibble::tibble(
 #'     contact_id = c(1, 2, 3),
 #'     location   = "some-town",
-#'     last_visit = Sys.Date() - c(4, 1, NA)
+#'     last_visit_date = Sys.Date() - c(4, 1, NA)
 #'   ),
 #'   infection_proba = list(normal = 0.2, funeral = 0.9)
 #' )

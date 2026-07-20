@@ -7,13 +7,14 @@
 \method{plot}{ctdata}(x, ...)
 }
 \arguments{
-\item{x}{a \code{ctdata} object returned by \code{\link[=make_ctdata]{make_ctdata()}}, or a \code{sim_ctdata}
-object returned by \code{\link[=sim_ctdata]{sim_ctdata()}}.}
+\item{x}{a \code{ctdata} object.}
 
 \item{...}{currently ignored.}
 }
 \value{
-A \code{ggplot} object.
+A \code{ggplot} object. Each contact's \code{linelist} columns (e.g.
+\code{location}) are carried in the plot data, so the result can be extended
+with, for example, \code{ggplot2::facet_wrap()} or \code{ggplot2::aes()} on them.
 }
 \description{
 Produces a timeline plot of contact-tracing data, with one row per contact
@@ -23,6 +24,14 @@ along a time axis. Contacts are ordered by first exposure day.
 \dontrun{
 ## simulated data (also shows infection date and symptom onset)
 plot(sim_ctdata())
+
+## facet by a linelist column
+sim_ctdata(
+  locations = list(cityA = 0.5, cityB = 0.5),
+  n_exposures = list(cityA = 2, cityB = 3)
+) |>
+  plot() +
+  ggplot2::facet_wrap(~location, scales = "free_y")
 }
 }
 \author{

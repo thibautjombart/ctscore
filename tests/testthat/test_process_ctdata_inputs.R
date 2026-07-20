@@ -146,7 +146,7 @@ test_that("process_onset_infected() enforces onset => infected", {
   ll <- function(onset, infected) {
     tibble::tibble(
       contact_id = as.character(seq_along(onset)),
-      onset = onset, infected = infected
+      onset_date = onset, infected = infected
     )
   }
 
@@ -162,7 +162,7 @@ test_that("process_onset_infected() enforces onset => infected", {
   expect_identical(process_onset_infected(ll(NA, TRUE)), ll(NA, TRUE))
 
   ## onset present without confirmed infection fails, reporting the contact(s)
-  msg <- "onset implies infected = TRUE"
+  msg <- "onset_date implies infected = TRUE"
   expect_error(process_onset_infected(ll(c(NA, 5), c(TRUE, FALSE))), msg) # FALSE
   expect_error(process_onset_infected(ll(5, NA)), msg) # unknown status
   expect_error(process_onset_infected(ll(c(1, 2), c(FALSE, FALSE))), "1, 2")

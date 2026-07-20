@@ -31,7 +31,7 @@
 #'   ),
 #'   linelist = tibble::tibble(
 #'     contact_id = c(1, 2, 3, 4),
-#'     last_visit = Sys.Date() - c(2, 1, 1, 3)
+#'     last_visit_date = Sys.Date() - c(2, 1, 1, 3)
 #'   ),
 #'   infection_proba = list(normal = 0.2, funeral = 0.9, null = 0)
 #' )
@@ -60,8 +60,8 @@ ctscore <- function(x,
   incub <- process_incub(incub)
 
   ## date of last asymptomatic visit, keyed by contact_id (one row per contact)
-  last_visit <- x$linelist$last_visit
-  names(last_visit) <- x$linelist$contact_id
+  last_visit_date <- x$linelist$last_visit_date
+  names(last_visit_date) <- x$linelist$contact_id
 
   ## score each contact from its exposures (dates ascending within a contact)
   by_contact <- split(x$exposures, x$exposures$contact_id)
@@ -70,7 +70,7 @@ ctscore <- function(x,
     calculate_ctscore(
       p_inf = e$infection_proba,
       e = e$date,
-      s = last_visit[[id]],
+      s = last_visit_date[[id]],
       t = current_date,
       incub = incub
     )

@@ -13,9 +13,9 @@ exposure-level data. \code{date} may be \code{Date}, numeric, or character (conv
 with \code{as.Date}).}
 
 \item{linelist}{an optional \code{data.frame} of individual-level data.
-Must contain \code{contact_id} and may contain \code{location}, \code{last_visit}, \code{infected},
-\code{onset}, plus any extra columns.
-\code{last_visit} and \code{onset} may be \code{Date} or numeric.}
+Must contain \code{contact_id} and may contain \code{location}, \code{last_visit_date}, \code{infected},
+\code{onset_date}, plus any extra columns.
+\code{last_visit_date} and \code{onset_date} may be \code{Date} or numeric.}
 
 \item{infection_proba}{a named \code{list} giving the probability of infection for
 each exposure \code{type}; names must match the types present in \code{exposures}.}
@@ -40,7 +40,7 @@ x <- make_ctdata(
   linelist = tibble::tibble(
     contact_id = c(1, 2, 3),
     location   = "some-town",
-    last_visit = Sys.Date() - c(4, 1, NA)
+    last_visit_date = Sys.Date() - c(4, 1, NA)
   ),
   infection_proba = list(normal = 0.2, funeral = 0.9)
 )
