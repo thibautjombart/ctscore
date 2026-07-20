@@ -75,38 +75,30 @@ test_that("infection status and onset are internally consistent", {
     n_exposures = list(A = 3, B = 3),
     locations = list(A = 0.5, B = 0.5)
   )
+  ll <- sim$linelist
 
   ## at least one contact is infected under the default probability
-  expect_true(any(sim$infected))
+  expect_true(any(ll$infected))
 
   ## onset is recorded exactly for infected contacts
-  expect_false(all(is.na(sim$onset[sim$infected])))
-  expect_true(all(is.na(sim$onset[!sim$infected])))
-
-  ## infected, onset and location are unique per contact_id
-  one <- function(x) {
-    length(unique(x)) == 1L
-  }
-  expect_true(all(tapply(sim$infected, sim$contact_id, one)))
-  expect_true(all(tapply(sim$onset, sim$contact_id, one)))
-  expect_true(all(tapply(sim$location, sim$contact_id, one)))
+  expect_false(all(is.na(ll$onset[ll$infected])))
+  expect_true(all(is.na(ll$onset[!ll$infected])))
 
   ## infection_date follows the same NA pattern as onset
-  expect_true(all(is.na(sim$infection_date[!sim$infected])))
-  expect_false(all(is.na(sim$infection_date[sim$infected])))
-  expect_true(all(tapply(sim$infection_date, sim$contact_id, one)))
+  expect_true(all(is.na(ll$infection_date[!ll$infected])))
+  expect_false(all(is.na(ll$infection_date[ll$infected])))
 
   ## onset is on/after the infection date
-  expect_true(all(sim$onset[sim$infected] >= sim$infection_date[sim$infected]))
+  expect_true(all(ll$onset[ll$infected] >= ll$infection_date[ll$infected]))
 
   ## no infection (and no onset) when the probability is zero
   sim0 <- sim_ctdata(
     n_contacts = 2000,
     infection_proba = list(default = 0)
   )
-  expect_false(any(sim0$infected))
-  expect_true(all(is.na(sim0$onset)))
-  expect_true(all(is.na(sim0$infection_date)))
+  expect_false(any(sim0$linelist$infected))
+  expect_true(all(is.na(sim0$linelist$onset)))
+  expect_true(all(is.na(sim0$linelist$infection_date)))
 })
 
 
@@ -116,7 +108,7 @@ test_that("type_proba are respected", {
     infection_proba = list(a = 0.5, b = 0.5),
     type_proba = list(b = 0, a = 1)
   )
-  expect_true(all(sim$type == "a"))
+  expect_true(all(sim$exposures$type == "a"))
 })
 
 
@@ -131,7 +123,7 @@ test_that("n_exposures are respected", {
     infection_proba = list(default = 0),
     locations = list(default = 1)
   )
-  per_contact <- as.numeric(table(sim$contact_id))
+  per_contact <- as.numeric(table(sim$exposures$contact_id))
   expect_mean(per_contact, mean(n_exp), var(n_exp))
 })
 
@@ -145,8 +137,9 @@ test_that("infection_proba are respected", {
     infection_proba = p,
     locations = list(default = 1)
   )
+  flat <- as_tibble(sim)
   for (type in names(p)) {
-    expect_proportion(sim$infected[sim$type == type], p[[type]])
+    expect_proportion(flat$infected[flat$type == type], p[[type]])
   }
 })
 
@@ -173,7 +166,7 @@ test_that("locations are respected", {
   )
   shares <- unlist(locs)
   for (loc in names(locs)) {
-    expect_proportion(sim$location == loc, shares[[loc]])
+    expect_proportion(sim$linelist$location == loc, shares[[loc]])
   }
 })
 
@@ -187,9 +180,9 @@ test_that("sim_ctdata returns a ctdata usable by ctscore", {
   sim <- sim_ctdata(n_contacts = n_contacts)
 
   ## check class and required columns
-  expect_s3_class(sim, "sim_ctdata")
   expect_s3_class(sim, "ctdata")
-  expect_true(all(c("infection_proba", "infected", "infection_date", "onset") %in% names(sim)))
+  expect_true("infection_proba" %in% names(sim$exposures))
+  expect_true(all(c("infected", "infection_date", "onset") %in% names(sim$linelist)))
 
 
   sc <- ctscore(sim,

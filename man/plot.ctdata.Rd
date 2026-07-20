@@ -23,7 +23,6 @@ along a time axis. Contacts are ordered by first exposure day.
 \dontrun{
 ## simulated data (also shows infection date and symptom onset)
 plot(sim_ctdata())
-
 }
 }
 \author{

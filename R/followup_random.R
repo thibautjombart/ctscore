@@ -47,13 +47,13 @@ is_eligible <- function(t, opens, closes, detection_date) {
   ## one row per contact, each with its own follow-up window:
   ##   opens  = first exposure + delay
   ##   closes = last exposure + duration
-  first_exp <- tapply(x$date, x$contact_id, min)
-  last_exp <- tapply(x$date, x$contact_id, max)
+  first_exp <- tapply(x$exposures$date, x$exposures$contact_id, min)
+  last_exp <- tapply(x$exposures$date, x$exposures$contact_id, max)
   ct <- data.frame(
     contact_id = names(first_exp),
     opens = as.integer(first_exp) + delay,
     closes = as.integer(last_exp) + duration,
-    onset = x$onset[match(names(first_exp), x$contact_id)],
+    onset = x$linelist$onset[match(names(first_exp), x$linelist$contact_id)],
     ## @thibautjombart do we use the last_visit from x?
     last_visit = NA_real_,
     # as.integer(x$last_visit[match(names(first_exp), x$contact_id)]),
@@ -88,9 +88,9 @@ is_eligible <- function(t, opens, closes, detection_date) {
     ct$last_visit[visited[!symptomatic]] <- t
   }
 
-  ## write per-contact follow-up history back onto the exposure rows
-  i <- match(x$contact_id, ct$contact_id)
-  x$last_visit <- ct$last_visit[i]
-  x$detection_date <- ct$detection_date[i]
+  ## write per-contact follow-up history back onto the linelist
+  i <- match(x$linelist$contact_id, ct$contact_id)
+  x$linelist$last_visit <- ct$last_visit[i]
+  x$linelist$detection_date <- ct$detection_date[i]
   x
 }

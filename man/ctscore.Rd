@@ -4,12 +4,7 @@
 \alias{ctscore}
 \title{Calculate contact tracing score}
 \usage{
-ctscore(
-  x,
-  incub,
-  current_date = Sys.Date(),
-  out_type = c("vector", "data.frame", "ctdata")
-)
+ctscore(x, incub, current_date = Sys.Date())
 }
 \arguments{
 \item{x}{a \code{ctdata} object as returned by \code{\link[=make_ctdata]{make_ctdata()}}}
@@ -20,16 +15,11 @@ of probabilities giving p(0 day), p(1 day), p(2 days) ... or as a
 
 \item{current_date}{the current date, provided either as a \code{numeric} value or
 as a \code{Date}; defaults to the current date as returned by \code{Sys.Date()}}
-
-\item{out_type}{a \code{character} indicating the type of output to return:
-"vector" (default) returns a named numeric vector of scores; "data.frame"
-returns a tibble with \code{contact_id} and \code{score}; "ctdata" returns the input
-\code{ctdata} object with a \code{score} column added to its \code{linelist}.}
 }
 \value{
-By default (\code{out_type = "vector"}) a named numeric vector giving the
-probability of detecting symptoms for each contact, named by contact ID.
-See \code{out_type} for the other shapes.
+A named numeric vector giving the probability of detecting symptoms
+for each contact, named by contact ID. Use \code{\link[=add_ctscore]{add_ctscore()}} to attach these
+scores to the \code{linelist} of the source \code{ctdata}.
 }
 \description{
 This function calculates the probability of detecting symptoms in a contact
@@ -53,16 +43,19 @@ x <- make_ctdata(
 ## incubation time PMF from day 0 to 7
 incub <- c(0, 0, 1, 2, 4, 3, 2, 1)
 
-## default: a named vector of scores
-ctscore(x, incub)
+## a named vector of scores
+score <- ctscore(x, incub)
+score
 
-## other shapes
-ctscore(x, incub, out_type = "data.frame")
-ctscore(x, incub, out_type = "ctdata")
+## attach the scores to the ctdata linelist
+add_ctscore(x, score)
 
 ## incubation as a distcrete object
 incub <- distcrete::distcrete("gamma", interval = 1, shape = 2, scale = 2.5, w = 0)
 ctscore(x, incub)
+}
+\seealso{
+\code{\link[=add_ctscore]{add_ctscore()}} to attach the scores back onto the \code{ctdata}.
 }
 \author{
 Thibaut Jombart

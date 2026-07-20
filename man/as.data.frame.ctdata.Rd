@@ -12,12 +12,10 @@
 \item{...}{ignored}
 }
 \value{
-A \code{data.frame} (tibble) with one row per exposure.
+A \code{data.frame} with one row per exposure.
 }
 \description{
-Reconstructs a single "flat" data frame with one row per exposure, joining the
-individual-level \code{linelist} columns onto the \code{exposures} table by
-\code{contact_id}. This is the exposure-level view used internally (e.g. by
-\code{\link[=plot.ctdata]{plot.ctdata()}}) and a convenient shape for users who want everything in one
-table.
+The base-R equivalent of \code{as_tibble(x, by_contact = FALSE)}: an
+exposure-level \code{data.frame} with the \code{linelist} columns joined onto each
+exposure row.
 }

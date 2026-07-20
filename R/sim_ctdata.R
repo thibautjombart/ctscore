@@ -25,11 +25,7 @@
 #'
 #' @param type_proba Named list giving the relative probability of each exposure type. Names must match `infection_proba`. Defaults to uniform.
 #'
-#' @return An object of class `c("sim_ctdata", "ctdata", "data.frame")` with one
-#'   row per exposure. Alongside the standard `ctdata` columns it carries the
-#'   simulation ground truth, constant within each contact: `infected` (logical),
-#'   `infection_date` (day of the infecting exposure, `NA` if not infected), and
-#'   `onset` (= `infection_date` + incubation, `NA` if not infected).
+#' @return A `ctdata` object.
 #'
 #' @seealso [make_ctdata()] to create a `ctdata` object from real data.
 #'
@@ -135,7 +131,6 @@ sim_ctdata <- function(n_contacts = 100,
       date = te,
       type = type,
       location = l,
-      last_visit = NA_real_,
       infected = infected,
       infection_date = t_inf,
       onset = t_ons,
@@ -146,17 +141,13 @@ sim_ctdata <- function(n_contacts = 100,
   ct <- do.call(rbind, lapply(seq_len(n_contacts), one_ct))
 
   out <- make_ctdata(
-    contact_id = ct$contact_id,
-    date = ct$date,
-    type = ct$type,
-    location = ct$location,
-    infection_proba = infection_proba[unique(ct$type)],
-    last_visit = ct$last_visit,
-    infected = ct$infected,
-    infection_date = ct$infection_date,
-    onset = ct$onset
+    exposures = ct[c("contact_id", "date", "type")],
+    linelist = unique(ct[c(
+      "contact_id", "location",
+      "infected", "infection_date", "onset"
+    )]),
+    infection_proba = infection_proba[unique(ct$type)]
   )
 
-  class(out) <- c("sim_ctdata", class(out))
   out
 }

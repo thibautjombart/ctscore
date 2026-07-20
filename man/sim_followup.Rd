@@ -61,9 +61,9 @@ second, third, etc.
 }
 }
 \examples{
-sim_ctdata() |> 
-sim_followup(coverage = 0.2, delay = 7, strategy = "random") |> 
-plot()
+sim_ctdata() |>
+  sim_followup(coverage = 0.2, delay = 7, strategy = "random") |>
+  plot()
 
 }
 \seealso{

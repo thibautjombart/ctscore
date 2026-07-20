@@ -21,7 +21,8 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 Imports:
     dplyr,
-    tibble
+    tibble,
+    tidyr
 Suggests:
     distcrete,
     ggplot2,
