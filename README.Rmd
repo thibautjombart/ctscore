@@ -157,20 +157,16 @@ We can use `as_tibble()` to flatten the `ctdata` object into a single data frame
 The argument `by_contact` indicates whether to return one row per contact (TRUE) or one row per exposure (FALSE, default):
 
 ```{r}
-as_tibble(xs, by_contact = TRUE) |>
-  slice_max(score, n = 1)
-
 as_tibble(xs) |>
-  filter(contact_id == 13)
+  slice_max(score, n = 6)
 ```
 
 The contact (ID 13) has the highest score because they had multiple 
 exposures, including several funeral exposures, and were last seen 26 days ago (on day 5, current day is 31), so there was ample time for symptoms to have appeared since then. In fact, the linelist recorded that this contact was infected and developed symptoms on day 14.
 
 ```{r}
-as_tibble(xs, by_contact = TRUE) |>
-  slice_min(score, n = 1) |>
-  _[["exposures"]]
+as_tibble(xs) |>
+  slice_min(score, n = 4)
 ```
 
 The lowest scoring contact had a single 'weak' 
