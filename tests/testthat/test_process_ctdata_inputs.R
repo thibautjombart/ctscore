@@ -49,21 +49,21 @@ test_that(
 
 
 test_that(
-  "process_type() works as expected",
+  "process_exposure_type() works as expected",
   {
     expect_identical(
-      process_type(1:3),
+      process_exposure_type(1:3),
       as.character(1:3)
     )
 
     expect_identical(
-      process_type(c("normal", "funeral")),
+      process_exposure_type(c("normal", "funeral")),
       c("normal", "funeral")
     )
 
 
     expect_identical(
-      process_type(factor(c("normal", "funeral"))),
+      process_exposure_type(factor(c("normal", "funeral"))),
       c("normal", "funeral")
     )
   }
@@ -97,7 +97,7 @@ test_that(
     x <- data.frame(
       contact_id = 1:3,
       date = Sys.Date() - 3:1,
-      type = c("normal", "normal", "funeral"),
+      exposure_type = c("normal", "normal", "funeral"),
       location = c("town", "town", "village")
     )
 

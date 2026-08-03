@@ -1,9 +1,13 @@
 #' Internal helpers and methods for `ctdata` objects
 #'
-#' A `ctdata` object is a `list` of two tibbles sharing a `contact_id` column:
+#' A `ctdata` object is a `list` of three tibbles:
 #' - `linelist`: one row per contact (individual-level data such as `location`,
 #'   `last_visit_date`, `infected`, `onset_date`, plus any extra columns).
-#' - `exposures`: one row per exposure (`date`, `type`, `infection_proba`).
+#' - `exposures`: one row per exposure (`contact_id`, `date`, `exposure_type`).
+#' - `risk`: one row per exposure type (`exposure_type`, `infection_proba`).
+#'
+#' `linelist` and `exposures` share a `contact_id` column; `exposures` and
+#' `risk` share an `exposure_type` column.
 #'
 #' @author Cyril Geismar
 #' @name ctdata
@@ -15,11 +19,23 @@ NULL
 #'
 #' See [make_ctdata()] for the user-facing builder.
 #'
+#' The `risk` table starts empty and is filled in by [add_infection_proba()].
+#'
 #' @param linelist a tibble with one row per contact
 #' @param exposures a tibble with one row per exposure
 #' @noRd
 new_ctdata <- function(linelist, exposures) {
-  structure(list(linelist = linelist, exposures = exposures), class = "ctdata")
+  structure(
+    list(
+      linelist = linelist,
+      exposures = exposures,
+      risk = tibble::tibble(
+        exposure_type = character(0),
+        infection_proba = numeric(0)
+      )
+    ),
+    class = "ctdata"
+  )
 }
 
 
@@ -34,7 +50,8 @@ tibble::as_tibble
 #' - `by_contact = FALSE` (default): one row per exposure, with contact-level
 #'   `linelist` columns added to each row.
 #' - `by_contact = TRUE`: one row per contact, with exposures stored in a nested
-#'   `exposures` list-column containing `date`, `type`, and `infection_proba`.
+#'   `exposures` list-column containing `date`, `exposure_type`, and
+#'   `infection_proba`.
 #'
 #' @param x a `ctdata` object
 #' @param by_contact `logical`; return one row per contact with nested
@@ -50,15 +67,16 @@ tibble::as_tibble
 #' as_tibble(x) # flat: one row per exposure
 #' as_tibble(x, by_contact = TRUE) # nested: one row per contact
 as_tibble.ctdata <- function(x, ..., by_contact = FALSE) {
+  exposures <- dplyr::left_join(x$exposures, x$risk, by = "exposure_type")
   if (by_contact) {
     dplyr::left_join(
       x$linelist,
-      tidyr::nest(x$exposures, exposures = -contact_id),
+      tidyr::nest(exposures, exposures = -contact_id),
       by = "contact_id"
     )
   } else {
     dplyr::arrange(
-      dplyr::left_join(x$exposures, x$linelist, by = "contact_id"),
+      dplyr::left_join(exposures, x$linelist, by = "contact_id"),
       contact_id, date
     )
   }
@@ -92,14 +110,17 @@ as.data.frame.ctdata <- function(x, ...) {
 #' @export
 print.ctdata <- function(x, ...) {
   cat(sprintf(
-    "%s: %d contact(s), %d exposure(s)\n",
+    "%s: %d contact(s), %d exposure(s), %d exposure type(s)\n",
     "<ctdata>",
     nrow(x$linelist),
-    nrow(x$exposures)
+    nrow(x$exposures),
+    nrow(x$risk)
   ))
   cat("\n$linelist\n")
   print(x$linelist, ...)
   cat("\n$exposures\n")
   print(x$exposures, ...)
+  cat("\n$risk\n")
+  print(x$risk, ...)
   invisible(x)
 }

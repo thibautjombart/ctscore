@@ -2,7 +2,8 @@
 ##
 ## Produces two xlsx files under inst/ (loaded in examples/README via
 ## system.file(), and split to match make_ctdata()'s two-table input):
-##   - toy_exposures.xlsx : one row per exposure  (contact_id, date, type)
+##   - toy_exposures.xlsx : one row per exposure  (contact_id, date,
+##                          exposure_type)
 ##   - toy_linelist.xlsx  : one row per contact   (contact_id, location,
 ##                          last_visit_date, infected, onset_date)
 ##
@@ -34,9 +35,9 @@ x <- sim_ctdata(
   sim_followup(coverage = 0.10, delay = 1, duration = 5, strategy = "random")
 
 ## keep only the columns of the original toy dataset
-## (drop infection_proba, infection_date, detection_date)
+## (drop infection_date, detection_date)
 exposures <- x$exposures |>
-  transmute(contact_id = as.integer(contact_id), date, type) |>
+  transmute(contact_id = as.integer(contact_id), date, exposure_type) |>
   arrange(contact_id, date)
 
 linelist <- x$linelist |>

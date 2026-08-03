@@ -10,9 +10,9 @@ test_that("random follow-up detects a symptomatic contact within its window", {
   ## contact A infected (onset day 12), contact B never infected; both exposed day 10
   x <- make_ctdata(
     exposures = tibble::tibble(
-      contact_id = c("A", "B"),
-      date       = c(10, 10),
-      type       = "exposure"
+      contact_id    = c("A", "B"),
+      date          = c(10, 10),
+      exposure_type = "exposure"
     ),
     linelist = tibble::tibble(
       contact_id = c("A", "B"),

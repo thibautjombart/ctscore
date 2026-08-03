@@ -63,20 +63,23 @@ exposures
 
 ### Creating a `ctdata` object
 
-A `ctdata` object is a list containing two data frames:
+A `ctdata` object is a list containing three data frames:
 
 - `linelist`: A data frame containing individual-level information, one row per `contact_id`. It contains the following columns:
   - `contact_id`: a unique identifier for each contact (required)
   - `location`: the location of the contact (optional)
-  - `last_visit`: the date of the last visit to the contact (optional)
+  - `last_visit_date`: the date of the last visit to the contact (optional)
   - `infected`: a logical indicating whether the contact was infected (optional)
   - `onset_date`: the date of symptom onset (optional)
-  
+
 - `exposures`: A data frame containing exposure-level information, one row per exposure. It contains the following columns:
   - `contact_id`: a unique identifier for each contact (required)
   - `date`: the date of exposure, indicated as an integer since the first exposure; in practice, this could be actual dates in the format YYYY-MM-DD (required)
-  - `type`: the type of exposure (e.g. "household", "funeral") (required)
-  - `infection_proba`: the probability of infection for a type of exposure (derived from the `infection_proba` argument)
+  - `exposure_type`: the type of exposure (e.g. "household", "funeral") (required)
+
+- `risk`: A data frame containing the risk attached to each type of exposure, one row per exposure type. It contains the following columns:
+  - `exposure_type`: the type of exposure, matching those found in `exposures`
+  - `infection_proba`: the probability of infection for that type of exposure (derived from the `infection_proba` argument)
 
 
 Infection probabilities (argument `infection_proba`) can be estimated from previous contact tracing data, from the literature, or by expert opinion. Here, we assume that household exposures have a 20% probability of infection, while funeral exposures have a 90% probability of infection.
@@ -153,7 +156,7 @@ xs$linelist |>
 ```
 
 
-We can use `as_tibble()` to flatten the `ctdata` object into a single data frame.
+We can use `as_tibble()` to flatten the `ctdata` object into a single data frame, joining the `risk` table onto each exposure.
 The argument `by_contact` indicates whether to return one row per contact (TRUE) or one row per exposure (FALSE, default):
 
 ```{r}

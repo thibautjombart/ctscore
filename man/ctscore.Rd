@@ -29,9 +29,9 @@ Jombart et al. 2026.
 \examples{
 x <- make_ctdata(
   exposures = tibble::tibble(
-    contact_id = c(1, 1, 2, 3, 4),
-    date       = Sys.Date() - c(6, 4, 5, 1, 5),
-    type       = c("normal", "funeral", "normal", "normal", "null")
+    contact_id    = c(1, 1, 2, 3, 4),
+    date          = Sys.Date() - c(6, 4, 5, 1, 5),
+    exposure_type = c("normal", "funeral", "normal", "normal", "null")
   ),
   linelist = tibble::tibble(
     contact_id = c(1, 2, 3, 4),

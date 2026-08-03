@@ -2,9 +2,9 @@
 make_x <- function() {
   make_ctdata(
     exposures = tibble::tibble(
-      contact_id = c(1, 1, 2, 3, 4),
-      date       = Sys.Date() - c(6, 4, 5, 1, 5),
-      type       = c("normal", "funeral", "normal", "normal", "null")
+      contact_id    = c(1, 1, 2, 3, 4),
+      date          = Sys.Date() - c(6, 4, 5, 1, 5),
+      exposure_type = c("normal", "funeral", "normal", "normal", "null")
     ),
     linelist = tibble::tibble(
       contact_id = c(1, 2, 3, 4),
@@ -22,10 +22,16 @@ test_that(
     expect_error(ctscore("pmspodf"), msg)
 
     x <- make_ctdata(
-      exposures = tibble::tibble(contact_id = 1, date = Sys.Date(), type = "default")
+      exposures = tibble::tibble(contact_id = 1, date = Sys.Date(), exposure_type = "default")
     )
     msg <- "'x' should be a numeric vector or a distcrete object"
     expect_error(ctscore(x, incub = "pmspodf"), msg)
+
+    ## an exposure type absent from `risk` errors rather than scoring it as zero
+    x <- make_x()
+    x$exposures$exposure_type[1] <- "unlisted"
+    msg <- "exposure type\\(s\\) missing from `x\\$risk`: unlisted"
+    expect_error(ctscore(x, incub = c(0, 0, 1, 2, 4, 3, 2, 1)), msg)
   }
 )
 
@@ -79,9 +85,9 @@ test_that(
 
     x_1 <- make_ctdata(
       exposures = tibble::tibble(
-        contact_id = c("a", "a", "b", "c", "d"),
-        date       = Sys.Date() - c(6, 4, 5, 1, 5),
-        type       = c("normal", "funeral", "normal", "normal", "null")
+        contact_id    = c("a", "a", "b", "c", "d"),
+        date          = Sys.Date() - c(6, 4, 5, 1, 5),
+        exposure_type = c("normal", "funeral", "normal", "normal", "null")
       ),
       linelist = tibble::tibble(
         contact_id = c("a", "b", "c", "d"),
@@ -117,7 +123,7 @@ test_that(
 
     res <- add_ctscore(x, score)
     expect_s3_class(res, "ctdata")
-    expect_identical(names(res), c("linelist", "exposures"))
+    expect_identical(names(res), c("linelist", "exposures", "risk"))
     expect_true("score" %in% names(res$linelist))
     expect_identical(res$exposures, x$exposures)
 

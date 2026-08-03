@@ -41,10 +41,10 @@ process_date <- function(x, na_ok = FALSE) {
 }
 
 
-#' Coerce exposure `type` to character.
+#' Coerce exposure types to character.
 #' @noRd
 #'
-process_type <- function(x) {
+process_exposure_type <- function(x) {
   as.character(x)
 }
 
@@ -60,13 +60,14 @@ process_location <- function(x) {
 #' Validate the `infection_proba` list against the exposure types.
 #'
 #' `proba` must be a named list of probabilities (each in `[0, 1]`) whose names
-#' are identical to the exposure types found in `x$type` (the exposures table).
+#' are identical to the exposure types found in `x$exposure_type` (the exposures
+#' table).
 #' @noRd
 process_infection_proba <- function(proba, x) {
   if (!is.list(proba)) {
     stop("`infection_proba` must be a named list.", call. = FALSE)
   }
-  if (!identical(sort(names(proba)), sort(unique(x$type)))) {
+  if (!identical(sort(names(proba)), sort(unique(x$exposure_type)))) {
     stop("Names of infection_proba must be identical to the types in the ctdata object",
       call. = FALSE
     )
@@ -117,10 +118,10 @@ process_onset_infected <- function(linelist) {
 
 #' Validate and process the exposures table of a ctdata object.
 #'
-#' Checks that the required columns (`contact_id`, `date`, `type`) are present,
-#' coerces their types, and orders the rows by contact then date. Extra columns
-#' are preserved. Infection probabilities are attached separately, by
-#' [add_infection_proba()].
+#' Checks that the required columns (`contact_id`, `date`, `exposure_type`) are
+#' present, coerces their types, and orders the rows by contact then date. Extra
+#' columns are preserved. Infection probabilities are held separately, in the
+#' `risk` table (see [add_infection_proba()]).
 #' @noRd
 process_exposures <- function(exposures) {
   if (!is.data.frame(exposures)) {
@@ -128,7 +129,7 @@ process_exposures <- function(exposures) {
       call. = FALSE
     )
   }
-  missing_cols <- setdiff(c("contact_id", "date", "type"), names(exposures))
+  missing_cols <- setdiff(c("contact_id", "date", "exposure_type"), names(exposures))
   if (length(missing_cols)) {
     stop("`exposures` is missing required column(s): ",
       paste(missing_cols, collapse = ", "),
@@ -138,7 +139,7 @@ process_exposures <- function(exposures) {
   exposures <- tibble::as_tibble(exposures)
   exposures$contact_id <- process_contact_id(exposures$contact_id)
   exposures$date <- process_date(exposures$date)
-  exposures$type <- process_type(exposures$type)
+  exposures$exposure_type <- process_exposure_type(exposures$exposure_type)
 
   dplyr::arrange(exposures, contact_id, date)
 }

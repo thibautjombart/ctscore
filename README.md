@@ -71,30 +71,31 @@ exposures <- rio::import(
 
 exposures
 #> # A tibble: 46 × 3
-#>    contact_id  date type     
-#>         <dbl> <dbl> <chr>    
-#>  1          1    19 funeral  
-#>  2          2    13 household
-#>  3          3     6 household
-#>  4          4    25 funeral  
-#>  5          5    12 household
-#>  6          6     9 funeral  
-#>  7          7     9 funeral  
-#>  8          8    24 funeral  
-#>  9          9     7 household
-#> 10          9    17 household
+#>    contact_id  date exposure_type
+#>         <dbl> <dbl> <chr>        
+#>  1          1    19 funeral      
+#>  2          2    13 household    
+#>  3          3     6 household    
+#>  4          4    25 funeral      
+#>  5          5    12 household    
+#>  6          6     9 funeral      
+#>  7          7     9 funeral      
+#>  8          8    24 funeral      
+#>  9          9     7 household    
+#> 10          9    17 household    
 #> # ℹ 36 more rows
 ```
 
 ### Creating a `ctdata` object
 
-A `ctdata` object is a list containing two data frames:
+A `ctdata` object is a list containing three data frames:
 
 - `linelist`: A data frame containing individual-level information, one
   row per `contact_id`. It contains the following columns:
   - `contact_id`: a unique identifier for each contact (required)
   - `location`: the location of the contact (optional)
-  - `last_visit`: the date of the last visit to the contact (optional)
+  - `last_visit_date`: the date of the last visit to the contact
+    (optional)
   - `infected`: a logical indicating whether the contact was infected
     (optional)
   - `onset_date`: the date of symptom onset (optional)
@@ -104,9 +105,14 @@ A `ctdata` object is a list containing two data frames:
   - `date`: the date of exposure, indicated as an integer since the
     first exposure; in practice, this could be actual dates in the
     format YYYY-MM-DD (required)
-  - `type`: the type of exposure (e.g. “household”, “funeral”)
+  - `exposure_type`: the type of exposure (e.g. “household”, “funeral”)
     (required)
-  - `infection_proba`: the probability of infection for a type of
+- `risk`: A data frame containing the risk attached to each type of
+  exposure, one row per exposure type. It contains the following
+  columns:
+  - `exposure_type`: the type of exposure, matching those found in
+    `exposures`
+  - `infection_proba`: the probability of infection for that type of
     exposure (derived from the `infection_proba` argument)
 
 Infection probabilities (argument `infection_proba`) can be estimated
@@ -122,7 +128,7 @@ x <- make_ctdata(
   infection_proba = list(household = 0.2, funeral = 0.9)
 )
 x
-#> <ctdata>: 30 contact(s), 46 exposure(s)
+#> <ctdata>: 30 contact(s), 46 exposure(s), 2 exposure type(s)
 #> 
 #> $linelist
 #> # A tibble: 30 × 5
@@ -141,20 +147,27 @@ x
 #> # ℹ 20 more rows
 #> 
 #> $exposures
-#> # A tibble: 46 × 4
-#>    contact_id  date type      infection_proba
-#>    <chr>      <dbl> <chr>               <dbl>
-#>  1 1             19 funeral               0.9
-#>  2 10             2 household             0.2
-#>  3 10             5 household             0.2
-#>  4 10            13 funeral               0.9
-#>  5 11            11 household             0.2
-#>  6 12            18 funeral               0.9
-#>  7 13             1 funeral               0.9
-#>  8 13             8 funeral               0.9
-#>  9 13            28 household             0.2
-#> 10 14            15 funeral               0.9
+#> # A tibble: 46 × 3
+#>    contact_id  date exposure_type
+#>    <chr>      <dbl> <chr>        
+#>  1 1             19 funeral      
+#>  2 10             2 household    
+#>  3 10             5 household    
+#>  4 10            13 funeral      
+#>  5 11            11 household    
+#>  6 12            18 funeral      
+#>  7 13             1 funeral      
+#>  8 13             8 funeral      
+#>  9 13            28 household    
+#> 10 14            15 funeral      
 #> # ℹ 36 more rows
+#> 
+#> $risk
+#> # A tibble: 2 × 2
+#>   exposure_type infection_proba
+#>   <chr>                   <dbl>
+#> 1 funeral                   0.9
+#> 2 household                 0.2
 class(x)
 #> [1] "ctdata"
 ```
@@ -246,26 +259,23 @@ xs$linelist |>
 <img src="man/figures/README-unnamed-chunk-9-1.png" alt="" width="100%" />
 
 We can use `as_tibble()` to flatten the `ctdata` object into a single
-data frame. The argument `by_contact` indicates whether to return one
-row per contact (TRUE) or one row per exposure (FALSE, default):
+data frame, joining the `risk` table onto each exposure. The argument
+`by_contact` indicates whether to return one row per contact (TRUE) or
+one row per exposure (FALSE, default):
 
 ``` r
-as_tibble(xs, by_contact = TRUE) |>
-  slice_max(score, n = 1)
-#> # A tibble: 1 × 7
-#>   contact_id location last_visit_date infected onset_date score exposures       
-#>   <chr>      <chr>              <dbl> <lgl>         <dbl> <dbl> <list>          
-#> 1 13         hotspot                5 TRUE             14 0.989 <tibble [3 × 3]>
-
 as_tibble(xs) |>
-  filter(contact_id == 13)
-#> # A tibble: 3 × 9
-#>   contact_id  date type      infection_proba location last_visit_date infected
-#>   <chr>      <dbl> <chr>               <dbl> <chr>              <dbl> <lgl>   
-#> 1 13             1 funeral               0.9 hotspot                5 TRUE    
-#> 2 13             8 funeral               0.9 hotspot                5 TRUE    
-#> 3 13            28 household             0.2 hotspot                5 TRUE    
-#> # ℹ 2 more variables: onset_date <dbl>, score <dbl>
+  slice_max(score, n = 6)
+#> # A tibble: 6 × 9
+#>   contact_id  date exposure_type infection_proba location last_visit_date
+#>   <chr>      <dbl> <chr>                   <dbl> <chr>              <dbl>
+#> 1 13             1 funeral                   0.9 hotspot                5
+#> 2 13             8 funeral                   0.9 hotspot                5
+#> 3 13            28 household                 0.2 hotspot                5
+#> 4 21             1 funeral                   0.9 new_city              NA
+#> 5 21            17 household                 0.2 new_city              NA
+#> 6 21            30 household                 0.2 new_city              NA
+#> # ℹ 3 more variables: infected <lgl>, onset_date <dbl>, score <dbl>
 ```
 
 The contact (ID 13) has the highest score because they had multiple
@@ -275,14 +285,17 @@ symptoms to have appeared since then. In fact, the linelist recorded
 that this contact was infected and developed symptoms on day 14.
 
 ``` r
-as_tibble(xs, by_contact = TRUE) |>
-  slice_min(score, n = 1) |>
-  _[["exposures"]]
-#> [[1]]
-#> # A tibble: 1 × 3
-#>    date type      infection_proba
-#>   <dbl> <chr>               <dbl>
-#> 1    29 household             0.2
+as_tibble(xs) |>
+  slice_min(score, n = 4)
+#> # A tibble: 5 × 9
+#>   contact_id  date exposure_type infection_proba location   last_visit_date
+#>   <chr>      <dbl> <chr>                   <dbl> <chr>                <dbl>
+#> 1 16            29 household                 0.2 hotspot                 NA
+#> 2 23            27 funeral                   0.9 local_town              30
+#> 3 27            19 household                 0.2 local_town              NA
+#> 4 18            10 household                 0.2 local_town              28
+#> 5 18            24 household                 0.2 local_town              28
+#> # ℹ 3 more variables: infected <lgl>, onset_date <dbl>, score <dbl>
 ```
 
 The lowest scoring contact had a single ‘weak’ exposure only 2 days ago,
@@ -311,7 +324,7 @@ sim <- sim_ctdata(
   type_proba = list(household = 0.7, funeral = 0.3)
 )
 sim
-#> <ctdata>: 20 contact(s), 55 exposure(s)
+#> <ctdata>: 20 contact(s), 55 exposure(s), 2 exposure type(s)
 #> 
 #> $linelist
 #> # A tibble: 20 × 6
@@ -339,20 +352,27 @@ sim
 #> 20 9          cityA                 NA FALSE            NA             NA
 #> 
 #> $exposures
-#> # A tibble: 55 × 4
-#>    contact_id  date type      infection_proba
-#>    <chr>      <int> <chr>               <dbl>
-#>  1 1             19 household             0.2
-#>  2 1             28 household             0.2
-#>  3 1             29 household             0.2
-#>  4 10             7 household             0.2
-#>  5 10            30 funeral               0.4
-#>  6 11             1 funeral               0.4
-#>  7 11            25 household             0.2
-#>  8 12            11 household             0.2
-#>  9 12            30 funeral               0.4
-#> 10 13            24 household             0.2
+#> # A tibble: 55 × 3
+#>    contact_id  date exposure_type
+#>    <chr>      <int> <chr>        
+#>  1 1             19 household    
+#>  2 1             28 household    
+#>  3 1             29 household    
+#>  4 10             7 household    
+#>  5 10            30 funeral      
+#>  6 11             1 funeral      
+#>  7 11            25 household    
+#>  8 12            11 household    
+#>  9 12            30 funeral      
+#> 10 13            24 household    
 #> # ℹ 45 more rows
+#> 
+#> $risk
+#> # A tibble: 2 × 2
+#>   exposure_type infection_proba
+#>   <chr>                   <dbl>
+#> 1 funeral                   0.4
+#> 2 household                 0.2
 ```
 
 `last_visit_date` is empty as we have not yet simulated a follow-up

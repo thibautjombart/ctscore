@@ -4,12 +4,17 @@
 \alias{ctdata}
 \title{Internal helpers and methods for \code{ctdata} objects}
 \description{
-A \code{ctdata} object is a \code{list} of two tibbles sharing a \code{contact_id} column:
+A \code{ctdata} object is a \code{list} of three tibbles:
 \itemize{
 \item \code{linelist}: one row per contact (individual-level data such as \code{location},
 \code{last_visit_date}, \code{infected}, \code{onset_date}, plus any extra columns).
-\item \code{exposures}: one row per exposure (\code{date}, \code{type}, \code{infection_proba}).
+\item \code{exposures}: one row per exposure (\code{contact_id}, \code{date}, \code{exposure_type}).
+\item \code{risk}: one row per exposure type (\code{exposure_type}, \code{infection_proba}).
 }
+}
+\details{
+\code{linelist} and \code{exposures} share a \code{contact_id} column; \code{exposures} and
+\code{risk} share an \code{exposure_type} column.
 }
 \author{
 Cyril Geismar

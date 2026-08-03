@@ -9,9 +9,9 @@
 #' @export
 #'
 #' @param exposures a `data.frame` of exposures, one row per exposure.
-#'   Must contain `contact_id`, `date` and `type`; any extra columns are kept as
-#'   exposure-level data. `date` may be `Date`, numeric, or character (converted
-#'   with `as.Date`).
+#'   Must contain `contact_id`, `date` and `exposure_type`; any extra columns
+#'   are kept as exposure-level data. `date` may be `Date`, numeric, or
+#'   character (converted with `as.Date`).
 #'
 #' @param linelist an optional `data.frame` of individual-level data.
 #'   Must contain `contact_id` and may contain `location`, `last_visit_date`, `infected`,
@@ -19,11 +19,14 @@
 #'   `last_visit_date` and `onset_date` may be `Date` or numeric.
 #'
 #' @param infection_proba a named `list` giving the probability of infection for
-#'   each exposure `type`; names must match the types present in `exposures`.
+#'   each `exposure_type`; names must match the types present in `exposures`.
 #'
-#' @return A `ctdata` object: a `list` of two tibbles sharing a `contact_id`
-#'   column — `linelist` (one row per contact) and `exposures` (one row per
-#'   exposure, with `infection_proba` attached), ordered by contact and date.
+#' @return A `ctdata` object: a `list` of three tibbles :
+#'  \itemize{
+#'  \item `linelist`: individual-level data.
+#'  \item `exposures`: exposure-level data.
+#'  \item `risk`: infection probabilities for each exposure type.
+#' }
 #'
 #' @seealso [sim_ctdata()] to simulate contact tracing data.
 #'
@@ -31,12 +34,12 @@
 #' x <- make_ctdata(
 #'   exposures = tibble::tibble(
 #'     contact_id = c(1, 1, 2, 3),
-#'     date       = Sys.Date() - c(6, 4, 2, 2),
-#'     type       = c("normal", "funeral", "normal", "normal")
+#'     date = Sys.Date() - c(6, 4, 2, 2),
+#'     exposure_type = c("normal", "funeral", "normal", "normal")
 #'   ),
 #'   linelist = tibble::tibble(
 #'     contact_id = c(1, 2, 3),
-#'     location   = "some-town",
+#'     location = "some-town",
 #'     last_visit_date = Sys.Date() - c(4, 1, NA)
 #'   ),
 #'   infection_proba = list(normal = 0.2, funeral = 0.9)

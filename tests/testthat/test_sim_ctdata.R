@@ -108,7 +108,7 @@ test_that("type_proba are respected", {
     infection_proba = list(a = 0.5, b = 0.5),
     type_proba = list(b = 0, a = 1)
   )
-  expect_true(all(sim$exposures$type == "a"))
+  expect_true(all(sim$exposures$exposure_type == "a"))
 })
 
 
@@ -139,7 +139,7 @@ test_that("infection_proba are respected", {
   )
   flat <- as_tibble(sim)
   for (type in names(p)) {
-    expect_proportion(flat$infected[flat$type == type], p[[type]])
+    expect_proportion(flat$infected[flat$exposure_type == type], p[[type]])
   }
 })
 
@@ -181,7 +181,7 @@ test_that("sim_ctdata returns a ctdata usable by ctscore", {
 
   ## check class and required columns
   expect_s3_class(sim, "ctdata")
-  expect_true("infection_proba" %in% names(sim$exposures))
+  expect_identical(names(sim$risk), c("exposure_type", "infection_proba"))
   expect_true(all(c("infected", "infection_date", "onset_date") %in% names(sim$linelist)))
 
 

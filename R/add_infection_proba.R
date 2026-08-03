@@ -8,8 +8,7 @@
 #'
 #' @author Thibaut Jombart
 #'
-#' @return a `ctdata` object with updated infection probabilities in its
-#'   `exposures` table
+#' @return a `ctdata` object with an updated `risk` table
 #'
 #' @param x a `ctdata` object
 #'
@@ -21,6 +20,12 @@ add_infection_proba <- function(x, proba) {
     stop("`x` must be a ctdata object.", call. = FALSE)
   }
   proba <- process_infection_proba(proba, x$exposures)
-  x$exposures$infection_proba <- unlist(proba[x$exposures$type], use.names = FALSE)
+  x$risk <- dplyr::arrange(
+    tibble::tibble(
+      exposure_type = names(proba),
+      infection_proba = unlist(proba, use.names = FALSE)
+    ),
+    exposure_type
+  )
   x
 }

@@ -26,8 +26,8 @@
 #' x <- make_ctdata(
 #'   exposures = tibble::tibble(
 #'     contact_id = c(1, 1, 2, 3, 4),
-#'     date       = Sys.Date() - c(6, 4, 5, 1, 5),
-#'     type       = c("normal", "funeral", "normal", "normal", "null")
+#'     date = Sys.Date() - c(6, 4, 5, 1, 5),
+#'     exposure_type = c("normal", "funeral", "normal", "normal", "null")
 #'   ),
 #'   linelist = tibble::tibble(
 #'     contact_id = c(1, 2, 3, 4),
@@ -63,12 +63,23 @@ ctscore <- function(x,
   last_visit_date <- x$linelist$last_visit_date
   names(last_visit_date) <- x$linelist$contact_id
 
+  ## probability of infection, keyed by exposure type (one row per type)
+  proba <- x$risk$infection_proba
+  names(proba) <- x$risk$exposure_type
+  unknown <- setdiff(x$exposures$exposure_type, names(proba))
+  if (length(unknown)) {
+    stop("exposure type(s) missing from `x$risk`: ",
+      paste(unknown, collapse = ", "),
+      call. = FALSE
+    )
+  }
+
   ## score each contact from its exposures (dates ascending within a contact)
   by_contact <- split(x$exposures, x$exposures$contact_id)
   vapply(names(by_contact), function(id) {
     e <- by_contact[[id]]
     calculate_ctscore(
-      p_inf = e$infection_proba,
+      p_inf = proba[e$exposure_type],
       e = e$date,
       s = last_visit_date[[id]],
       t = current_date,

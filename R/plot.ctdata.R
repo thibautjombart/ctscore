@@ -44,7 +44,7 @@ plot.ctdata <- function(x, ...) {
     as_tibble(x) |>
       dplyr::select(-dplyr::any_of(names(linelist_shapes))) |>
       dplyr::mutate(event = "exposure"),
-    
+
     ## linelist events:
     x$linelist |>
       tidyr::pivot_longer(dplyr::any_of(names(linelist_shapes)), names_to = "event", values_to = "date") |>
@@ -56,7 +56,7 @@ plot.ctdata <- function(x, ...) {
     ggplot2::geom_line(ggplot2::aes(group = contact_id), colour = "grey80") +
     ggplot2::geom_point(
       data = dplyr::filter(d, event == "exposure"),
-      ggplot2::aes(fill = type), shape = 21, colour = "black", size = 3
+      ggplot2::aes(fill = exposure_type), shape = 21, colour = "black", size = 3
     ) +
     ggplot2::geom_point(
       data = dplyr::filter(d, event != "exposure"),
@@ -65,12 +65,14 @@ plot.ctdata <- function(x, ...) {
     ggplot2::scale_shape_manual(
       values = linelist_shapes,
       breaks = names(linelist_shapes),
-      labels = c(infection_date = "infection", onset_date = "onset",
-                 last_visit_date = "last visit", detection_date = "detection"),
+      labels = c(
+        infection_date = "infection", onset_date = "onset",
+        last_visit_date = "last visit", detection_date = "detection"
+      ),
       name = NULL
     ) +
     ggplot2::coord_cartesian(clip = "off") +
-    ggplot2::labs(x = "day", y = "ID") +
+    ggplot2::labs(x = "day", y = "ID", fill = "exposure type") +
     ggplot2::theme_classic() +
     ggplot2::theme(legend.position = "bottom")
 }

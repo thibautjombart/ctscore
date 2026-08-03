@@ -109,7 +109,7 @@ sim_ctdata <- function(n_contacts = 100,
     l <- sample(names(locations), 1, prob = unlist(locations))
     k <- resample(dist$n_exposures[[l]], 1)
     te <- sort(sample(1:duration, k, replace = FALSE)) # only one exposure per day
-    type <- sample(names(infection_proba),
+    exposure_type <- sample(names(infection_proba),
       k,
       replace = TRUE,
       prob = if (is.null(type_proba)) {
@@ -118,7 +118,7 @@ sim_ctdata <- function(n_contacts = 100,
         unlist(type_proba)[names(infection_proba)]
       }
     )
-    pi_e <- calculate_p_infection(unlist(infection_proba[type]))
+    pi_e <- calculate_p_infection(unlist(infection_proba[exposure_type]))
 
     ## Sample the exposure responsible for infection (NA = not infected)
     k_inf <- sample(c(seq_along(pi_e), NA), 1, prob = c(pi_e, 1 - sum(pi_e)))
@@ -129,7 +129,7 @@ sim_ctdata <- function(n_contacts = 100,
     data.frame(
       contact_id = id,
       date = te,
-      type = type,
+      exposure_type = exposure_type,
       location = l,
       infected = infected,
       infection_date = t_inf,
@@ -141,12 +141,12 @@ sim_ctdata <- function(n_contacts = 100,
   ct <- do.call(rbind, lapply(seq_len(n_contacts), one_ct))
 
   out <- make_ctdata(
-    exposures = ct[c("contact_id", "date", "type")],
+    exposures = ct[c("contact_id", "date", "exposure_type")],
     linelist = unique(ct[c(
       "contact_id", "location",
       "infected", "infection_date", "onset_date"
     )]),
-    infection_proba = infection_proba[unique(ct$type)]
+    infection_proba = infection_proba[unique(ct$exposure_type)]
   )
 
   out

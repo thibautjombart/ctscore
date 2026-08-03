@@ -18,12 +18,14 @@ exposures (\code{TRUE}), or one row per exposure (\code{FALSE}, default)}
 A tibble.
 }
 \description{
-Two formats are available:
+The \code{risk} table is joined onto the exposures, so that every exposure carries
+its \code{infection_proba}. Two formats are available:
 \itemize{
 \item \code{by_contact = FALSE} (default): one row per exposure, with contact-level
 \code{linelist} columns added to each row.
 \item \code{by_contact = TRUE}: one row per contact, with exposures stored in a nested
-\code{exposures} list-column containing \code{date}, \code{type}, and \code{infection_proba}.
+\code{exposures} list-column containing \code{date}, \code{exposure_type}, and
+\code{infection_proba}.
 }
 }
 \examples{
