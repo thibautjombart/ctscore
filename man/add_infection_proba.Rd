@@ -12,7 +12,7 @@ add_infection_proba(x, proba)
 \item{proba}{a named \code{list} of probabilities for each exposure type}
 }
 \value{
-a \code{ctdata} object with updated infection probabilities
+a \code{ctdata} object with an updated \code{risk} table
 }
 \description{
 This function can be used to add or change infection probabilities in a

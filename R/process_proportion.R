@@ -1,8 +1,8 @@
 #' Check proportion input
-#' 
+#'
 #' Internal. This function ensures that its input is numeric, finite, and
 #' between 0 and 1. It is used to validate proportion inputs in other functions.
-#' 
+#'
 #' @noRd
 #' @author Thibaut Jombart
 #' @param x the input to validate

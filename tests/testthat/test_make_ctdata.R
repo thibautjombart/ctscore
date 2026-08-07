@@ -1,132 +1,88 @@
-test_that(
-  "Constructor issues correct errors", 
-  {
-    msg <- 'argument "contact_id" is missing, with no default'
-    expect_error(make_ctdata(), msg)
-    
-    msg <- 'argument "date" is missing, with no default'
-    expect_error(make_ctdata(contact_id = 1), msg)
-      
-  }
-)
+test_that("make_ctdata() issues correct errors", {
+  exp <- tibble::tibble(contact_id = 1, date = Sys.Date(), exposure_type = "normal")
 
+  ## exposures missing a required column
+  expect_error(make_ctdata(exp[c("contact_id", "date")]), "missing required column")
 
-
-
-test_that(
-  "Constructor works with basic input", 
-  {
-  res <- make_ctdata(contact_id = "toto", date = Sys.Date())
-  expect_identical(
-    dim(res),
-    c(1L, 8L)
+  ## linelist missing a contact present in exposures
+  expect_error(
+    make_ctdata(exp,
+      linelist = tibble::tibble(contact_id = 99),
+      infection_proba = list(normal = 0.2)
+    ),
+    "missing contact"
   )
-  expect_identical(
-    names(res),
-    c("contact_id", "date", "type", "location", "last_visit", "infected", "onset", "infection_proba")
+})
+
+
+test_that("make_ctdata() builds a three-table ctdata (linelist derived from exposures)", {
+  x <- make_ctdata(
+    exposures = tibble::tibble(contact_id = 1, date = Sys.Date(), exposure_type = "normal"),
+    infection_proba = list(normal = 0.2)
   )
-  
-  expect_true(inherits(res, "ctdata"))
-  expect_true(inherits(res, "data.frame"))
-  
-  }
-)
+  expect_s3_class(x, "ctdata")
+  expect_identical(names(x), c("linelist", "exposures", "risk"))
+  expect_s3_class(x$exposures, "tbl_df")
+
+  ## with no linelist, one all-NA row per contact is derived
+  expect_identical(x$linelist$contact_id, "1")
+  expect_identical(names(x$linelist), c("contact_id", "location", "last_visit_date", "infected", "onset_date"))
+  expect_true(all(is.na(x$linelist[, -1])))
+})
 
 
+test_that("make_ctdata() processes and orders exposures, and builds risk", {
+  x <- make_ctdata(
+    exposures = tibble::tibble(
+      contact_id    = c(1, 1, 2),
+      date          = as.character(as.Date("2026-06-19") - 1:3), # character dates
+      exposure_type = factor(c("normal", "funeral", "funeral")) # factor type
+    ),
+    infection_proba = list(normal = 0.1, funeral = 0.5)
+  )
+  e <- x$exposures
+  expect_identical(e$contact_id, c("1", "1", "2")) # coerced, ordered by contact then date
+  expect_identical(e$date, as.Date(c("2026-06-17", "2026-06-18", "2026-06-16")))
+  expect_identical(e$exposure_type, c("funeral", "normal", "funeral"))
 
-
-test_that(
-  "Constructor does basic input processing and reordering",
-  {
-    id <- c(1, 1, 2)
-    date <- as.Date("2026-06-19") - 1:3
-    type <- c("normal", "funeral", "funeral")
-    location <- factor("town")
-    date_txt <- as.character(date)
-    res <- make_ctdata(
-      contact_id = id, 
-      date = date_txt, 
-      type = type, 
-      location = location, 
-      infection_proba = list(normal = 0.1, funeral = 0.5),
-      last_visit = date_txt
+  ## probabilities live in `risk`, one row per type, not on the exposures
+  expect_false("infection_proba" %in% names(e))
+  expect_identical(
+    x$risk,
+    tibble::tibble(
+      exposure_type = c("funeral", "normal"),
+      infection_proba = c(0.5, 0.1)
     )
-    
-    expect_true(inherits(res, "ctdata"))
-    expect_true(inherits(res, "data.frame"))
-    expect_identical(res$contact_id, as.character(id))
-    expect_identical(res$date, as.Date(c("2026-06-17", "2026-06-18", "2026-06-16")))
-    expect_identical(res$type, c("funeral", "normal", "funeral"))
-    expect_identical(res$location, rep("town", 3))
-    expect_equal(res$infection_proba, c(0.5, 0.1, 0.5))
-    expect_identical(res$date, res$last_visit)
-    
-  } 
-)
+  )
+
+  ## as_tibble() joins them back onto each exposure
+  expect_equal(as_tibble(x)$infection_proba, c(0.5, 0.1, 0.5))
+})
 
 
-
-test_that(
-  "make_ctdata() handles NA in last_visit",
-  {
-    id <- c(1, 1, 2)
-    date <- as.Date("2026-06-19") - 1:3
-    type <- c("normal", "funeral", "funeral")
-    location <- factor("town")
-    date_txt <- as.character(date)
-    res <- make_ctdata(
-      contact_id = id, 
-      date = date_txt, 
-      type = type, 
-      location = location, 
-      infection_proba = list(normal = 0.1, funeral = 0.5),
-      last_visit = c(as.Date(NA), as.Date(NA), as.Date("2026-06-19")- 1)
-    )
-    
-    expect_true(inherits(res, "ctdata"))
-    expect_true(inherits(res, "data.frame"))
-    expect_identical(res$contact_id, as.character(id))
-    expect_identical(res$date, as.Date(c("2026-06-17", "2026-06-18", "2026-06-16")))
-    expect_identical(res$type, c("funeral", "normal", "funeral"))
-    expect_identical(res$location, rep("town", 3))
-    expect_equal(res$infection_proba, c(0.5, 0.1, 0.5))
-    expect_identical(res$last_visit, as.Date(c(NA, NA, "2026-06-18")))
-  }
-)
+test_that("make_ctdata() validates and keeps a supplied linelist", {
+  x <- make_ctdata(
+    exposures = tibble::tibble(contact_id = c(1, 2), date = Sys.Date(), exposure_type = "normal"),
+    linelist = tibble::tibble(
+      contact_id = c(1, 2),
+      last_visit_date = c(as.Date(NA), as.Date("2026-06-18")),
+      ward = "A" # extra column, recycled and kept
+    ),
+    infection_proba = list(normal = 0.2)
+  )
+  expect_identical(x$linelist$contact_id, c("1", "2"))
+  expect_identical(x$linelist$last_visit_date, c(as.Date(NA), as.Date("2026-06-18"))) # NA preserved
+  expect_identical(x$linelist$ward, c("A", "A"))
+})
 
 
 test_that("make_ctdata() rejects an onset without infection", {
   expect_error(
-    make_ctdata(contact_id = 1, date = Sys.Date(),
-                infected = FALSE, onset = Sys.Date()),
-    "onset implies infected = TRUE"
+    make_ctdata(
+      exposures = tibble::tibble(contact_id = 1, date = Sys.Date(), exposure_type = "normal"),
+      linelist = tibble::tibble(contact_id = 1, infected = FALSE, onset_date = Sys.Date()),
+      infection_proba = list(normal = 0.2)
+    ),
+    "onset_date implies infected = TRUE"
   )
-})
-
-test_that("make_ctdata() appends and recycles extra columns via ...", {
-  res <- make_ctdata(contact_id = c(1, 2), date = Sys.Date() - c(2, 2),
-                     vaccinated = c(TRUE, FALSE), ward = "A")
-  expect_true(all(c("vaccinated", "ward") %in% names(res)))
-  expect_identical(res$ward, c("A", "A"))          # length-1 recycled
-})
-
-test_that("make_ctdata() rejects a duplicated formal argument", {
-  ## duplicating a formal is caught by R's argument matching, before the body runs
-  expect_error(
-    make_ctdata(contact_id = 1, date = Sys.Date(), contact_id = "Paul"),
-    "matched by multiple actual arguments"
-  )
-})
-
-test_that("make_ctdata() blocks ... names that collide with downstream columns", {
-  ## 'score' is added later by ctscore(); it is not a formal, so it reaches ...
-  expect_error(
-    make_ctdata(contact_id = 1, date = Sys.Date(), score = 5),
-    "clash with reserved"
-  )
-})
-
-test_that("make_ctdata() no longer requires last_visit", {
-  res <- make_ctdata(contact_id = 1, date = Sys.Date())
-  expect_true(all(is.na(res$last_visit)))
 })

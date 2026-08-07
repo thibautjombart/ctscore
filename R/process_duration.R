@@ -1,10 +1,10 @@
 #' Check duration input
-#' 
+#'
 #' Internal. This function ensures that its input is numeric, finite, and
 #' non-negative. Optionally it can check that it is strictly positive. It is
-#' used to validate duration inputs in other functions. It returns its own 
+#' used to validate duration inputs in other functions. It returns its own
 #' argument converted to `integer`.
-#' 
+#'
 #' @noRd
 #' @author Thibaut Jombart
 #' @param x the input to validate

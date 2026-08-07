@@ -4,70 +4,46 @@
 \alias{make_ctdata}
 \title{Build a ctdata object}
 \usage{
-make_ctdata(
-  contact_id,
-  date,
-  type = "default",
-  location = "default",
-  infection_proba = list(default = 0),
-  last_visit = NA_real_,
-  infected = NA,
-  onset = NA_real_,
-  ...
-)
+make_ctdata(exposures, linelist = NULL, infection_proba = list(default = 0))
 }
 \arguments{
-\item{contact_id}{a \code{character} or a \code{numeric} vector indicating identifiers
-for the contacts; will be converted to \code{character} if not already}
+\item{exposures}{a \code{data.frame} of exposures, one row per exposure.
+Must contain \code{contact_id}, \code{date} and \code{exposure_type}; any extra columns
+are kept as exposure-level data. \code{date} may be \code{Date}, numeric, or
+character (converted with \code{as.Date}).}
 
-\item{date}{a \code{Date}, \code{numeric}, or \code{character} vector indicating dates of
-exposures; \code{character} will be converted to \code{Date} using \code{as.Date}, with
-expected formats "\%Y-\%m-\%d" or "\%Y/\%m/\%d"; fancier conversions should be
-done before creating a \code{ctdata} object}
+\item{linelist}{an optional \code{data.frame} of individual-level data.
+Must contain \code{contact_id} and may contain \code{location}, \code{last_visit_date}, \code{infected},
+\code{onset_date}, plus any extra columns.
+\code{last_visit_date} and \code{onset_date} may be \code{Date} or numeric.}
 
-\item{type}{a \code{character} used to describe the type of exposure; defaults to
-\code{default}}
-
-\item{location}{a \code{character} used to describe the geographic location of the
-contact; defaults to \code{default}}
-
-\item{infection_proba}{a \code{list} of named numeric values, each indicating the
-probability of infection for a given contact; defaults to a list with
-'default' exposure having a probability of infection of 0}
-
-\item{last_visit}{the date of the last visit to the contact, where they
-exhibited no symptoms; the type provided must match that of \code{date}; if the
-contact has not been visited yet, this should be \code{NA}}
-
-\item{infected}{\code{logical} infection status per contact, or \code{NA} when unknown;
-defaults to \code{NA}.}
-
-\item{onset}{the date of symptom onset for the contact; the type provided
-must match that of \code{date}; if the contact has not developed symptoms,
-this should be \code{NA}}
-
-\item{...}{additional named vectors to append as extra columns; each must be
-length 1 (recycled) or match the number of rows, and names must not clash
-with existing columns}
+\item{infection_proba}{a named \code{list} giving the probability of infection for
+each \code{exposure_type}; names must match the types present in \code{exposures}.}
 }
 \value{
-A \code{ctdata} object, which is a validated and ordered (by contact ID
-and date of exposure) \code{data.frame} designed to be used in the \link{ctscore}
-function.
+A \code{ctdata} object: a \code{list} of three tibbles — \code{linelist} (one row
+per contact), \code{exposures} (one row per exposure, ordered by contact and
+date) and \code{risk} (one row per exposure type, holding \code{infection_proba}).
 }
 \description{
-This constructor will build a \code{ctdata} object from different inputs
-describing past exposures and follow-up history for different individuals.
+Builds a \code{ctdata} object from two tables: \code{exposures} (one row per exposure)
+and an optional \code{linelist} (one row per contact). Both are keyed by
+\code{contact_id}. The infection probabilities are stored as a third table,
+\code{risk}, with one row per exposure type.
 }
 \examples{
-
 x <- make_ctdata(
-  contact_id = c(1, 1, 2, 3), 
-  date = Sys.Date() - c(6, 4, 2, 2),
-  type = c("normal", "funeral", "normal", "normal"),
-  location = "some-town",
-  infection_proba = list(normal = 0.2, funeral = 0.9),
-  last_visit = Sys.Date() - c(4, 4, 1, NA)
+  exposures = tibble::tibble(
+    contact_id    = c(1, 1, 2, 3),
+    date          = Sys.Date() - c(6, 4, 2, 2),
+    exposure_type = c("normal", "funeral", "normal", "normal")
+  ),
+  linelist = tibble::tibble(
+    contact_id = c(1, 2, 3),
+    location   = "some-town",
+    last_visit_date = Sys.Date() - c(4, 1, NA)
+  ),
+  infection_proba = list(normal = 0.2, funeral = 0.9)
 )
 x
 class(x)
@@ -76,5 +52,5 @@ class(x)
 \code{\link[=sim_ctdata]{sim_ctdata()}} to simulate contact tracing data.
 }
 \author{
-Thibaut Jombart
+Thibaut Jombart / Cyril Geismar
 }

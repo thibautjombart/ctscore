@@ -6,3 +6,4 @@ README.Rmd
 ^docs$
 ^pkgdown$
 ^\.github$
+^data-raw$
