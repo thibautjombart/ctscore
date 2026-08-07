@@ -7,12 +7,7 @@ described in Jombart et al. 2026.
 ## Usage
 
 ``` r
-ctscore(
-  x,
-  incub,
-  current_date = Sys.Date(),
-  out_type = c("vector", "data.frame", "ctdata", "ctdata_full")
-)
+ctscore(x, incub, current_date = Sys.Date())
 ```
 
 ## Arguments
@@ -34,18 +29,17 @@ ctscore(
   defaults to the current date as returned by
   [`Sys.Date()`](https://rdrr.io/r/base/Sys.time.html)
 
-- out_type:
-
-  a `character` indicating the type of output to return; can be either
-  "vector" (default) to return a named vector of scores, "data.frame" to
-  return a data frame with contact IDs and scores, "ctdata" to return a
-  `ctdata` object with individual data and scores, or "ctdata_full" to
-  append scores to the original `ctdata` of exposure data
-
 ## Value
 
 A named numeric vector giving the probability of detecting symptoms for
-each contact, with names corresponding to the contact IDs.
+each contact, named by contact ID. Use
+[`add_ctscore()`](thibautjombart.github.io/ctscore/reference/add_ctscore.md)
+to attach these scores to the `linelist` of the source `ctdata`.
+
+## See also
+
+[`add_ctscore()`](thibautjombart.github.io/ctscore/reference/add_ctscore.md)
+to attach the scores back onto the `ctdata`.
 
 ## Author
 
@@ -54,76 +48,62 @@ Thibaut Jombart
 ## Examples
 
 ``` r
-## make dummy contact tracing data
 x <- make_ctdata(
-  contact_id = c(1, 1, 2, 3, 4), 
-  date = Sys.Date() - c(6, 4, 5, 1, 5),
-  type = c("normal", "funeral", "normal", "normal", "null"),
-  location = "some-town",
-  infection_proba = list(normal = 0.2, funeral = 0.9, null = 0),
-  last_visit = Sys.Date() - c(4, 2, 1, 1, 3)
+  exposures = tibble::tibble(
+    contact_id    = c(1, 1, 2, 3, 4),
+    date          = Sys.Date() - c(6, 4, 5, 1, 5),
+    exposure_type = c("normal", "funeral", "normal", "normal", "null")
+  ),
+  linelist = tibble::tibble(
+    contact_id = c(1, 2, 3, 4),
+    last_visit_date = Sys.Date() - c(2, 1, 1, 3)
+  ),
+  infection_proba = list(normal = 0.2, funeral = 0.9, null = 0)
 )
 
-## make a dummy incubation time distribution, specifying the PMF from 0 to 
-## 7 days here
+## incubation time PMF from day 0 to 7
 incub <- c(0, 0, 1, 2, 4, 3, 2, 1)
 
-## get results
-res <- ctscore(x, incub)
-res
+## a named vector of scores
+score <- ctscore(x, incub)
+score
 #>         1         2         3         4 
 #> 0.5266667 0.1000000 0.0000000 0.0000000 
 
-## other useful shape for results: a ctdata object of individuals data with 
-## scores appended
-res <- ctscore(x, incub, out_type = "ctdata")
-res
-#>   contact_id  location last_visit infected onset     score
-#> 1          1 some-town 2026-07-09       NA    NA 0.5266667
-#> 3          2 some-town 2026-07-12       NA    NA 0.1000000
-#> 4          3 some-town 2026-07-12       NA    NA 0.0000000
-#> 5          4 some-town 2026-07-10       NA    NA 0.0000000
+## attach the scores to the ctdata linelist
+add_ctscore(x, score)
+#> <ctdata>: 4 contact(s), 5 exposure(s), 3 exposure type(s)
+#> 
+#> $linelist
+#> # A tibble: 4 × 6
+#>   contact_id location last_visit_date infected onset_date score
+#>   <chr>      <chr>    <date>          <lgl>    <date>     <dbl>
+#> 1 1          NA       2026-08-05      NA       NA         0.527
+#> 2 2          NA       2026-08-06      NA       NA         0.1  
+#> 3 3          NA       2026-08-06      NA       NA         0    
+#> 4 4          NA       2026-08-04      NA       NA         0    
+#> 
+#> $exposures
+#> # A tibble: 5 × 3
+#>   contact_id date       exposure_type
+#>   <chr>      <date>     <chr>        
+#> 1 1          2026-08-01 normal       
+#> 2 1          2026-08-03 funeral      
+#> 3 2          2026-08-02 normal       
+#> 4 3          2026-08-06 normal       
+#> 5 4          2026-08-02 null         
+#> 
+#> $risk
+#> # A tibble: 3 × 2
+#>   exposure_type infection_proba
+#>   <chr>                   <dbl>
+#> 1 funeral                   0.9
+#> 2 normal                    0.2
+#> 3 null                      0  
 
-## other example using `distcrete` to build the incubation time distribution
+## incubation as a distcrete object
 incub <- distcrete::distcrete("gamma", interval = 1, shape = 2, scale = 2.5, w = 0)
-res <- ctscore(x, incub)
-res
+ctscore(x, incub)
 #>          1          2          3          4 
 #> 0.36501065 0.04806079 0.02763199 0.00000000 
-
-## trying other output shapes
-### data.frame with individual data
-res_df <- ctscore(x, incub, out_type = "data.frame")
-res_df
-#>   contact_id      score
-#> 1          1 0.36501065
-#> 2          2 0.04806079
-#> 3          3 0.02763199
-#> 4          4 0.00000000
-
-### ctdata object of individuals with scores appended
-res_ctdata <- ctscore(x, incub, out_type = "ctdata")
-res_ctdata
-#>   contact_id  location last_visit infected onset      score
-#> 1          1 some-town 2026-07-09       NA    NA 0.36501065
-#> 3          2 some-town 2026-07-12       NA    NA 0.04806079
-#> 4          3 some-town 2026-07-12       NA    NA 0.02763199
-#> 5          4 some-town 2026-07-10       NA    NA 0.00000000
-
-
-### same, with all original exposure data
-res_ctdata_full <- ctscore(x, incub, out_type = "ctdata_full")
-res_ctdata_full
-#>   contact_id       date    type  location last_visit infected onset
-#> 1          1 2026-07-07  normal some-town 2026-07-09       NA    NA
-#> 2          1 2026-07-09 funeral some-town 2026-07-11       NA    NA
-#> 3          2 2026-07-08  normal some-town 2026-07-12       NA    NA
-#> 4          3 2026-07-12  normal some-town 2026-07-12       NA    NA
-#> 5          4 2026-07-08    null some-town 2026-07-10       NA    NA
-#>   infection_proba      score
-#> 1             0.2 0.36501065
-#> 2             0.9 0.36501065
-#> 3             0.2 0.04806079
-#> 4             0.2 0.02763199
-#> 5             0.0 0.00000000
 ```

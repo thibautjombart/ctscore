@@ -91,11 +91,7 @@ Names must match <code>type_proba</code>.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>An object of class <code>c("sim_ctdata", "ctdata", "data.frame")</code> with one
-row per exposure. Alongside the standard <code>ctdata</code> columns it carries the
-simulation ground truth, constant within each contact: <code>infected</code> (logical),
-<code>infection_date</code> (day of the infecting exposure, <code>NA</code> if not infected), and
-<code>onset</code> (= <code>infection_date</code> + incubation, <code>NA</code> if not infected).</p>
+    <p>A <code>ctdata</code> object.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -109,31 +105,64 @@ simulation ground truth, constant within each contact: <code>infected</code> (lo
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu">sim_ctdata</span><span class="op">(</span></span></span>
-<span class="r-in"><span> n_contacts <span class="op">=</span> <span class="fl">10</span>,</span></span>
-<span class="r-in"><span>duration <span class="op">=</span> <span class="fl">30</span>,</span></span>
-<span class="r-in"><span>incub <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">7</span>,</span></span>
-<span class="r-in"><span>locations <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>cityA <span class="op">=</span> <span class="fl">0.8</span>, cityB <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>n_exposures <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>cityA <span class="op">=</span> <span class="fl">2</span>, cityB <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">3</span>,<span class="fl">4</span>,<span class="fl">5</span>,<span class="fl">10</span><span class="op">)</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>infection_proba <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>household <span class="op">=</span> <span class="fl">0.2</span>, funeral <span class="op">=</span> <span class="fl">0.4</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>type_proba <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>household <span class="op">=</span> <span class="fl">0.7</span>, funeral <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  n_contacts <span class="op">=</span> <span class="fl">10</span>,</span></span>
+<span class="r-in"><span>  duration <span class="op">=</span> <span class="fl">30</span>,</span></span>
+<span class="r-in"><span>  incub <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">7</span>,</span></span>
+<span class="r-in"><span>  locations <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>cityA <span class="op">=</span> <span class="fl">0.8</span>, cityB <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  n_exposures <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>cityA <span class="op">=</span> <span class="fl">2</span>, cityB <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">5</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  infection_proba <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>household <span class="op">=</span> <span class="fl">0.2</span>, funeral <span class="op">=</span> <span class="fl">0.4</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  type_proba <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>household <span class="op">=</span> <span class="fl">0.7</span>, funeral <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   contact_id date      type location last_visit infected onset infection_date</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1          1    3   funeral    cityA         NA    FALSE    NA             NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2          1   25 household    cityA         NA    FALSE    NA             NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3         10    2 household    cityA         NA     TRUE     6              2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4         10   24   funeral    cityA         NA     TRUE     6              2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5          2    6 household    cityA         NA     TRUE    16              9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6          2    9   funeral    cityA         NA     TRUE    16              9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   infection_proba</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1             0.4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2             0.2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3             0.2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4             0.4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5             0.2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6             0.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $linelist</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 10 × 6</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    contact_id location last_visit_date infected onset_date infection_date</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> 1          cityA                 <span style="color: #BB0000;">NA</span> TRUE              5              2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> 10         cityA                 <span style="color: #BB0000;">NA</span> TRUE             22             20</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> 2          cityA                 <span style="color: #BB0000;">NA</span> FALSE            <span style="color: #BB0000;">NA</span>             <span style="color: #BB0000;">NA</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> 3          cityA                 <span style="color: #BB0000;">NA</span> TRUE              6              1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> 4          cityA                 <span style="color: #BB0000;">NA</span> FALSE            <span style="color: #BB0000;">NA</span>             <span style="color: #BB0000;">NA</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> 5          cityA                 <span style="color: #BB0000;">NA</span> TRUE             23             22</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> 6          cityA                 <span style="color: #BB0000;">NA</span> TRUE             11              5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> 7          cityA                 <span style="color: #BB0000;">NA</span> FALSE            <span style="color: #BB0000;">NA</span>             <span style="color: #BB0000;">NA</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> 8          cityA                 <span style="color: #BB0000;">NA</span> TRUE              4              2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> 9          cityA                 <span style="color: #BB0000;">NA</span> TRUE             35             30</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $exposures</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 20 × 3</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    contact_id  date exposure_type</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> 1              2 funeral      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> 1             23 household    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> 10            20 household    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> 10            23 funeral      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> 2              1 funeral      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> 2              7 household    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> 3              1 funeral      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> 3              8 funeral      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> 4              9 funeral      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> 4             10 funeral      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">11</span> 5             22 household    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">12</span> 5             28 household    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">13</span> 6              5 household    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">14</span> 6             17 household    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">15</span> 7              5 funeral      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">16</span> 7             23 household    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">17</span> 8              2 household    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">18</span> 8             24 funeral      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">19</span> 9             13 household    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">20</span> 9             30 funeral      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $risk</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 2 × 2</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   exposure_type infection_proba</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> funeral                   0.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> household                 0.2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "sim_ctdata" "ctdata"     "data.frame"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "ctdata"</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

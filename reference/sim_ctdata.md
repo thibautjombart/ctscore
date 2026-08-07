@@ -54,12 +54,7 @@ sim_ctdata(
 
 ## Value
 
-An object of class `c("sim_ctdata", "ctdata", "data.frame")` with one
-row per exposure. Alongside the standard `ctdata` columns it carries the
-simulation ground truth, constant within each contact: `infected`
-(logical), `infection_date` (day of the infecting exposure, `NA` if not
-infected), and `onset` (= `infection_date` + incubation, `NA` if not
-infected).
+A `ctdata` object.
 
 ## See also
 
@@ -74,29 +69,62 @@ Cyril Geismar
 
 ``` r
 x <- sim_ctdata(
- n_contacts = 10,
-duration = 30,
-incub = 1:7,
-locations = list(cityA = 0.8, cityB = 0.2),
-n_exposures = list(cityA = 2, cityB = c(2,2,3,4,5,10)),
-infection_proba = list(household = 0.2, funeral = 0.4),
-type_proba = list(household = 0.7, funeral = 0.3)
+  n_contacts = 10,
+  duration = 30,
+  incub = 1:7,
+  locations = list(cityA = 0.8, cityB = 0.2),
+  n_exposures = list(cityA = 2, cityB = c(2, 2, 3, 4, 5, 10)),
+  infection_proba = list(household = 0.2, funeral = 0.4),
+  type_proba = list(household = 0.7, funeral = 0.3)
 )
 head(x)
-#>   contact_id date      type location last_visit infected onset infection_date
-#> 1          1    3   funeral    cityA         NA    FALSE    NA             NA
-#> 2          1   25 household    cityA         NA    FALSE    NA             NA
-#> 3         10    2 household    cityA         NA     TRUE     6              2
-#> 4         10   24   funeral    cityA         NA     TRUE     6              2
-#> 5          2    6 household    cityA         NA     TRUE    16              9
-#> 6          2    9   funeral    cityA         NA     TRUE    16              9
-#>   infection_proba
-#> 1             0.4
-#> 2             0.2
-#> 3             0.2
-#> 4             0.4
-#> 5             0.2
-#> 6             0.4
+#> $linelist
+#> # A tibble: 10 × 6
+#>    contact_id location last_visit_date infected onset_date infection_date
+#>    <chr>      <chr>              <dbl> <lgl>         <dbl>          <dbl>
+#>  1 1          cityA                 NA TRUE              5              2
+#>  2 10         cityA                 NA TRUE             22             20
+#>  3 2          cityA                 NA FALSE            NA             NA
+#>  4 3          cityA                 NA TRUE              6              1
+#>  5 4          cityA                 NA FALSE            NA             NA
+#>  6 5          cityA                 NA TRUE             23             22
+#>  7 6          cityA                 NA TRUE             11              5
+#>  8 7          cityA                 NA FALSE            NA             NA
+#>  9 8          cityA                 NA TRUE              4              2
+#> 10 9          cityA                 NA TRUE             35             30
+#> 
+#> $exposures
+#> # A tibble: 20 × 3
+#>    contact_id  date exposure_type
+#>    <chr>      <int> <chr>        
+#>  1 1              2 funeral      
+#>  2 1             23 household    
+#>  3 10            20 household    
+#>  4 10            23 funeral      
+#>  5 2              1 funeral      
+#>  6 2              7 household    
+#>  7 3              1 funeral      
+#>  8 3              8 funeral      
+#>  9 4              9 funeral      
+#> 10 4             10 funeral      
+#> 11 5             22 household    
+#> 12 5             28 household    
+#> 13 6              5 household    
+#> 14 6             17 household    
+#> 15 7              5 funeral      
+#> 16 7             23 household    
+#> 17 8              2 household    
+#> 18 8             24 funeral      
+#> 19 9             13 household    
+#> 20 9             30 funeral      
+#> 
+#> $risk
+#> # A tibble: 2 × 2
+#>   exposure_type infection_proba
+#>   <chr>                   <dbl>
+#> 1 funeral                   0.4
+#> 2 household                 0.2
+#> 
 class(x)
-#> [1] "sim_ctdata" "ctdata"     "data.frame"
+#> [1] "ctdata"
 ```

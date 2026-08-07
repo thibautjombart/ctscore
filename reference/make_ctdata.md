@@ -1,84 +1,42 @@
 # Build a ctdata object
 
-This constructor will build a `ctdata` object from different inputs
-describing past exposures and follow-up history for different
-individuals.
+Builds a `ctdata` object from two tables: `exposures` (one row per
+exposure) and an optional `linelist` (one row per contact). Both are
+keyed by `contact_id`. The infection probabilities are stored as a third
+table, `risk`, with one row per exposure type.
 
 ## Usage
 
 ``` r
-make_ctdata(
-  contact_id,
-  date,
-  type = "default",
-  location = "default",
-  infection_proba = list(default = 0),
-  last_visit = NA_real_,
-  infected = NA,
-  onset = NA_real_,
-  ...
-)
+make_ctdata(exposures, linelist = NULL, infection_proba = list(default = 0))
 ```
 
 ## Arguments
 
-- contact_id:
+- exposures:
 
-  a `character` or a `numeric` vector indicating identifiers for the
-  contacts; will be converted to `character` if not already
+  a `data.frame` of exposures, one row per exposure. Must contain
+  `contact_id`, `date` and `exposure_type`; any extra columns are kept
+  as exposure-level data. `date` may be `Date`, numeric, or character
+  (converted with `as.Date`).
 
-- date:
+- linelist:
 
-  a `Date`, `numeric`, or `character` vector indicating dates of
-  exposures; `character` will be converted to `Date` using `as.Date`,
-  with expected formats "%Y-%m-%d" or "%Y/%m/%d"; fancier conversions
-  should be done before creating a `ctdata` object
-
-- type:
-
-  a `character` used to describe the type of exposure; defaults to
-  `default`
-
-- location:
-
-  a `character` used to describe the geographic location of the contact;
-  defaults to `default`
+  an optional `data.frame` of individual-level data. Must contain
+  `contact_id` and may contain `location`, `last_visit_date`,
+  `infected`, `onset_date`, plus any extra columns. `last_visit_date`
+  and `onset_date` may be `Date` or numeric.
 
 - infection_proba:
 
-  a `list` of named numeric values, each indicating the probability of
-  infection for a given contact; defaults to a list with 'default'
-  exposure having a probability of infection of 0
-
-- last_visit:
-
-  the date of the last visit to the contact, where they exhibited no
-  symptoms; the type provided must match that of `date`; if the contact
-  has not been visited yet, this should be `NA`
-
-- infected:
-
-  `logical` infection status per contact, or `NA` when unknown; defaults
-  to `NA`.
-
-- onset:
-
-  the date of symptom onset for the contact; the type provided must
-  match that of `date`; if the contact has not developed symptoms, this
-  should be `NA`
-
-- ...:
-
-  additional named vectors to append as extra columns; each must be
-  length 1 (recycled) or match the number of rows, and names must not
-  clash with existing columns
+  a named `list` giving the probability of infection for each
+  `exposure_type`; names must match the types present in `exposures`.
 
 ## Value
 
-A `ctdata` object, which is a validated and ordered (by contact ID and
-date of exposure) `data.frame` designed to be used in the
-[ctscore](thibautjombart.github.io/ctscore/reference/ctscore.md)
-function.
+A `ctdata` object: a `list` of three tibbles — `linelist` (one row per
+contact), `exposures` (one row per exposure, ordered by contact and
+date) and `risk` (one row per exposure type, holding `infection_proba`).
 
 ## See also
 
@@ -87,31 +45,50 @@ to simulate contact tracing data.
 
 ## Author
 
-Thibaut Jombart
+Thibaut Jombart / Cyril Geismar
 
 ## Examples
 
 ``` r
-
 x <- make_ctdata(
-  contact_id = c(1, 1, 2, 3), 
-  date = Sys.Date() - c(6, 4, 2, 2),
-  type = c("normal", "funeral", "normal", "normal"),
-  location = "some-town",
-  infection_proba = list(normal = 0.2, funeral = 0.9),
-  last_visit = Sys.Date() - c(4, 4, 1, NA)
+  exposures = tibble::tibble(
+    contact_id    = c(1, 1, 2, 3),
+    date          = Sys.Date() - c(6, 4, 2, 2),
+    exposure_type = c("normal", "funeral", "normal", "normal")
+  ),
+  linelist = tibble::tibble(
+    contact_id = c(1, 2, 3),
+    location   = "some-town",
+    last_visit_date = Sys.Date() - c(4, 1, NA)
+  ),
+  infection_proba = list(normal = 0.2, funeral = 0.9)
 )
 x
-#>   contact_id       date    type  location last_visit infected onset
-#> 1          1 2026-07-07  normal some-town 2026-07-09       NA    NA
-#> 2          1 2026-07-09 funeral some-town 2026-07-09       NA    NA
-#> 3          2 2026-07-11  normal some-town 2026-07-12       NA    NA
-#> 4          3 2026-07-11  normal some-town       <NA>       NA    NA
-#>   infection_proba
-#> 1             0.2
-#> 2             0.9
-#> 3             0.2
-#> 4             0.2
+#> <ctdata>: 3 contact(s), 4 exposure(s), 2 exposure type(s)
+#> 
+#> $linelist
+#> # A tibble: 3 × 5
+#>   contact_id location  last_visit_date infected onset_date
+#>   <chr>      <chr>     <date>          <lgl>    <date>    
+#> 1 1          some-town 2026-08-03      NA       NA        
+#> 2 2          some-town 2026-08-06      NA       NA        
+#> 3 3          some-town NA              NA       NA        
+#> 
+#> $exposures
+#> # A tibble: 4 × 3
+#>   contact_id date       exposure_type
+#>   <chr>      <date>     <chr>        
+#> 1 1          2026-08-01 normal       
+#> 2 1          2026-08-03 funeral      
+#> 3 2          2026-08-05 normal       
+#> 4 3          2026-08-05 normal       
+#> 
+#> $risk
+#> # A tibble: 2 × 2
+#>   exposure_type infection_proba
+#>   <chr>                   <dbl>
+#> 1 funeral                   0.9
+#> 2 normal                    0.2
 class(x)
-#> [1] "ctdata"     "data.frame"
+#> [1] "ctdata"
 ```

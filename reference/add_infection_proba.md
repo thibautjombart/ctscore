@@ -24,7 +24,7 @@ add_infection_proba(x, proba)
 
 ## Value
 
-a `ctdata` object with updated infection probabilities
+a `ctdata` object with an updated `risk` table
 
 ## Author
 

@@ -60,8 +60,8 @@ sim_followup(
 
 ## Value
 
-`x` with columns `last_visit` and `detection_date` updated according to
-the follow-up strategy.
+`x` with columns `last_visit_date` and `detection_date` updated
+according to the follow-up strategy.
 
 ## Details
 
@@ -96,8 +96,8 @@ Thibaut Jombart
 ## Examples
 
 ``` r
-sim_ctdata() |> 
-sim_followup(coverage = 0.2, delay = 7, strategy = "random") |> 
-plot()
+sim_ctdata() |>
+  sim_followup(coverage = 0.2, delay = 7, strategy = "random") |>
+  plot()
 
 ```

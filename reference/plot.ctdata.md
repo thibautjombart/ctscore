@@ -14,10 +14,7 @@ plot(x, ...)
 
 - x:
 
-  a `ctdata` object returned by
-  [`make_ctdata()`](thibautjombart.github.io/ctscore/reference/make_ctdata.md),
-  or a `sim_ctdata` object returned by
-  [`sim_ctdata()`](thibautjombart.github.io/ctscore/reference/sim_ctdata.md).
+  a `ctdata` object.
 
 - ...:
 
@@ -25,7 +22,12 @@ plot(x, ...)
 
 ## Value
 
-A `ggplot` object.
+A `ggplot` object. Each contact's `linelist` columns (e.g. `location`)
+are carried in the plot data, so the result can be extended with, for
+example,
+[`ggplot2::facet_wrap()`](https://ggplot2.tidyverse.org/reference/facet_wrap.html)
+or [`ggplot2::aes()`](https://ggplot2.tidyverse.org/reference/aes.html)
+on them.
 
 ## Author
 
@@ -38,5 +40,12 @@ if (FALSE) { # \dontrun{
 ## simulated data (also shows infection date and symptom onset)
 plot(sim_ctdata())
 
+## facet by a linelist column
+sim_ctdata(
+  locations = list(cityA = 0.5, cityB = 0.5),
+  n_exposures = list(cityA = 2, cityB = 3)
+) |>
+  plot() +
+  ggplot2::facet_wrap(~location, scales = "free_y")
 } # }
 ```
