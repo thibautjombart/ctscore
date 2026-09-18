@@ -20,7 +20,9 @@
 #'   for each contact, named by contact ID. Use [add_ctscore()] to attach these
 #'   scores to the `linelist` of the source `ctdata`.
 #'
-#' @seealso [add_ctscore()] to attach the scores back onto the `ctdata`.
+#' @seealso [add_ctscore()] to attach the scores back onto the `ctdata`, and
+#'   [p_infected()] and [add_p_infected()] to calculate the probability of
+#'   infection for each contact.
 #'
 #' @examples
 #' x <- make_ctdata(
@@ -44,7 +46,13 @@
 #' score
 #'
 #' ## attach the scores to the ctdata linelist
-#' add_ctscore(x, score)
+#' res <- add_ctscore(x, score)
+#' 
+#' ## do the same with probabilities of infection for each contact
+#' ## this can be useful for informing post exposure prophylaxis (PEP)
+#' p_inf <- p_infected(x)
+#' res <- add_p_infected(x, res)
+#' res
 #'
 #' ## incubation as a distcrete object
 #' incub <- distcrete::distcrete("gamma", interval = 1, shape = 2, scale = 2.5, w = 0)

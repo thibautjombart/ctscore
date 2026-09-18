@@ -21,26 +21,28 @@ Must contain \code{contact_id} and may contain \code{location}, \code{last_visit
 each \code{exposure_type}; names must match the types present in \code{exposures}.}
 }
 \value{
-A \code{ctdata} object: a \code{list} of three tibbles — \code{linelist} (one row
-per contact), \code{exposures} (one row per exposure, ordered by contact and
-date) and \code{risk} (one row per exposure type, holding \code{infection_proba}).
+A \code{ctdata} object: a \code{list} of three tibbles :
+\itemize{
+\item \code{linelist}: individual-level data.
+\item \code{exposures}: exposure-level data.
+\item \code{risk}: infection probabilities for each exposure type.
+}
 }
 \description{
 Builds a \code{ctdata} object from two tables: \code{exposures} (one row per exposure)
 and an optional \code{linelist} (one row per contact). Both are keyed by
-\code{contact_id}. The infection probabilities are stored as a third table,
-\code{risk}, with one row per exposure type.
+\code{contact_id}.
 }
 \examples{
 x <- make_ctdata(
   exposures = tibble::tibble(
-    contact_id    = c(1, 1, 2, 3),
-    date          = Sys.Date() - c(6, 4, 2, 2),
+    contact_id = c(1, 1, 2, 3),
+    date = Sys.Date() - c(6, 4, 2, 2),
     exposure_type = c("normal", "funeral", "normal", "normal")
   ),
   linelist = tibble::tibble(
     contact_id = c(1, 2, 3),
-    location   = "some-town",
+    location = "some-town",
     last_visit_date = Sys.Date() - c(4, 1, NA)
   ),
   infection_proba = list(normal = 0.2, funeral = 0.9)
