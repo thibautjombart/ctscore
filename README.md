@@ -238,6 +238,23 @@ x
 #> 2 household                 0.2
 ```
 
+We can visualise the result:
+
+``` r
+
+ggplot(x$linelist, aes(x = p_infected, y = reorder(contact_id, p_infected))) +
+  geom_col() +
+  scale_x_continuous(n.breaks = 10, limits = c(0,1)) + 
+  theme_bw() +
+  labs(
+    x = "Probability of the contact being infected",
+    y = "Contact ID",
+    title = "Probability of infection"
+  )
+```
+
+<img src="man/figures/README-unnamed-chunk-8-1.png" alt="" width="100%" />
+
 ### Scoring with `ctscore()`
 
 `ctscore` computes, for each contact, the probability that a visit today
@@ -270,7 +287,7 @@ plot(
 )
 ```
 
-<img src="man/figures/README-unnamed-chunk-8-1.png" alt="" width="100%" />
+<img src="man/figures/README-unnamed-chunk-9-1.png" alt="" width="100%" />
 
 We can now calculate the `score` using the `ctscore()` function, the
 current date is day 31 (again, this could be a real date in practice, in
@@ -306,6 +323,7 @@ can be useful for prioritising visits:
 xs$linelist |>
   ggplot(aes(x = score, y = reorder(contact_id, score))) +
   geom_col() +
+  scale_x_continuous(n.breaks = 10, limits = c(0,1)) + 
   theme_bw() +
   labs(
     x = "ctscore (probability of detecting symptoms)",
@@ -314,7 +332,7 @@ xs$linelist |>
   )
 ```
 
-<img src="man/figures/README-unnamed-chunk-11-1.png" alt="" width="100%" />
+<img src="man/figures/README-unnamed-chunk-12-1.png" alt="" width="100%" />
 
 We can use `as_tibble()` to flatten the `ctdata` object into a single
 data frame, joining the `risk` table onto each exposure. The argument
@@ -478,4 +496,4 @@ plot(f) +
   facet_wrap(~location, scales = "free_y")
 ```
 
-<img src="man/figures/README-unnamed-chunk-16-1.png" alt="" width="100%" />
+<img src="man/figures/README-unnamed-chunk-17-1.png" alt="" width="100%" />

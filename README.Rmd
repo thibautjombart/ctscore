@@ -117,6 +117,20 @@ x <- add_p_infected(x, p_inf)
 x
 ```
 
+We can visualise the result:
+```{r}
+
+ggplot(x$linelist, aes(x = p_infected, y = reorder(contact_id, p_infected))) +
+  geom_col() +
+  scale_x_continuous(n.breaks = 10, limits = c(0,1)) + 
+  theme_bw() +
+  labs(
+    x = "Probability of the contact being infected",
+    y = "Contact ID",
+    title = "Probability of infection"
+  )
+
+```
 
 
 
@@ -169,6 +183,7 @@ We can use a simple plot to visualise the scores for each contact, which can be 
 xs$linelist |>
   ggplot(aes(x = score, y = reorder(contact_id, score))) +
   geom_col() +
+  scale_x_continuous(n.breaks = 10, limits = c(0,1)) + 
   theme_bw() +
   labs(
     x = "ctscore (probability of detecting symptoms)",
