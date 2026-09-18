@@ -17,6 +17,7 @@
 #' @seealso [add_p_infected()] to attach the results back onto the `ctdata`.
 #'
 #' @examples
+#' ## create ctdata
 #' x <- make_ctdata(
 #'   exposures = tibble::tibble(
 #'     contact_id = c(1, 1, 2, 3, 4),
@@ -30,19 +31,14 @@
 #'   infection_proba = list(normal = 0.2, funeral = 0.9, null = 0)
 #' )
 #'
-#' ## incubation time PMF from day 0 to 7
-#' incub <- c(0, 0, 1, 2, 4, 3, 2, 1)
-#'
-#' ## a named vector of scores
-#' score <- ctscore(x, incub)
-#' score
+#' ## a named vector of proba of infection
+#' p_inf <- p_infected(x)
+#' p_inf
 #'
 #' ## attach the scores to the ctdata linelist
-#' add_ctscore(x, score)
-#'
-#' ## incubation as a distcrete object
-#' incub <- distcrete::distcrete("gamma", interval = 1, shape = 2, scale = 2.5, w = 0)
-#' ctscore(x, incub)
+#' x <- add_p_infected(x, p_inf)
+#' x
+#' 
 p_infected <- function(x) {
   
   if (!inherits(x, "ctdata")) {

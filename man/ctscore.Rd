@@ -48,14 +48,22 @@ score <- ctscore(x, incub)
 score
 
 ## attach the scores to the ctdata linelist
-add_ctscore(x, score)
+res <- add_ctscore(x, score)
+
+## do the same with probabilities of infection for each contact
+## this can be useful for informing post exposure prophylaxis (PEP)
+p_inf <- p_infected(x)
+res <- add_p_infected(x, res)
+res
 
 ## incubation as a distcrete object
 incub <- distcrete::distcrete("gamma", interval = 1, shape = 2, scale = 2.5, w = 0)
 ctscore(x, incub)
 }
 \seealso{
-\code{\link[=add_ctscore]{add_ctscore()}} to attach the scores back onto the \code{ctdata}.
+\code{\link[=add_ctscore]{add_ctscore()}} to attach the scores back onto the \code{ctdata}, and
+\code{\link[=p_infected]{p_infected()}} and \code{\link[=add_p_infected]{add_p_infected()}} to calculate the probability of
+infection for each contact.
 }
 \author{
 Thibaut Jombart
