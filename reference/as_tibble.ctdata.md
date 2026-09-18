@@ -1,7 +1,6 @@
 # Coerce a `ctdata` object to a tibble
 
-The `risk` table is joined onto the exposures, so that every exposure
-carries its `infection_proba`. Two formats are available:
+Two formats are available:
 
 - `by_contact = FALSE` (default): one row per exposure, with
   contact-level `linelist` columns added to each row.

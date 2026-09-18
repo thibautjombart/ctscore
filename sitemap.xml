@@ -6,12 +6,15 @@
 <url><loc>thibautjombart.github.io/ctscore/index.html</loc></url>
 <url><loc>thibautjombart.github.io/ctscore/reference/add_ctscore.html</loc></url>
 <url><loc>thibautjombart.github.io/ctscore/reference/add_infection_proba.html</loc></url>
+<url><loc>thibautjombart.github.io/ctscore/reference/add_p_infected.html</loc></url>
 <url><loc>thibautjombart.github.io/ctscore/reference/as.data.frame.ctdata.html</loc></url>
 <url><loc>thibautjombart.github.io/ctscore/reference/as_tibble.ctdata.html</loc></url>
+<url><loc>thibautjombart.github.io/ctscore/reference/calculate_p_infection.html</loc></url>
 <url><loc>thibautjombart.github.io/ctscore/reference/ctdata.html</loc></url>
 <url><loc>thibautjombart.github.io/ctscore/reference/ctscore.html</loc></url>
 <url><loc>thibautjombart.github.io/ctscore/reference/index.html</loc></url>
 <url><loc>thibautjombart.github.io/ctscore/reference/make_ctdata.html</loc></url>
+<url><loc>thibautjombart.github.io/ctscore/reference/p_infected.html</loc></url>
 <url><loc>thibautjombart.github.io/ctscore/reference/plot.ctdata.html</loc></url>
 <url><loc>thibautjombart.github.io/ctscore/reference/print.ctdata.html</loc></url>
 <url><loc>thibautjombart.github.io/ctscore/reference/reexports.html</loc></url>

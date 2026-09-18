@@ -2,8 +2,7 @@
 
 Builds a `ctdata` object from two tables: `exposures` (one row per
 exposure) and an optional `linelist` (one row per contact). Both are
-keyed by `contact_id`. The infection probabilities are stored as a third
-table, `risk`, with one row per exposure type.
+keyed by `contact_id`.
 
 ## Usage
 
@@ -34,9 +33,13 @@ make_ctdata(exposures, linelist = NULL, infection_proba = list(default = 0))
 
 ## Value
 
-A `ctdata` object: a `list` of three tibbles — `linelist` (one row per
-contact), `exposures` (one row per exposure, ordered by contact and
-date) and `risk` (one row per exposure type, holding `infection_proba`).
+A `ctdata` object: a `list` of three tibbles :
+
+- `linelist`: individual-level data.
+
+- `exposures`: exposure-level data.
+
+- `risk`: infection probabilities for each exposure type.
 
 ## See also
 
@@ -52,13 +55,13 @@ Thibaut Jombart / Cyril Geismar
 ``` r
 x <- make_ctdata(
   exposures = tibble::tibble(
-    contact_id    = c(1, 1, 2, 3),
-    date          = Sys.Date() - c(6, 4, 2, 2),
+    contact_id = c(1, 1, 2, 3),
+    date = Sys.Date() - c(6, 4, 2, 2),
     exposure_type = c("normal", "funeral", "normal", "normal")
   ),
   linelist = tibble::tibble(
     contact_id = c(1, 2, 3),
-    location   = "some-town",
+    location = "some-town",
     last_visit_date = Sys.Date() - c(4, 1, NA)
   ),
   infection_proba = list(normal = 0.2, funeral = 0.9)
@@ -70,18 +73,18 @@ x
 #> # A tibble: 3 × 5
 #>   contact_id location  last_visit_date infected onset_date
 #>   <chr>      <chr>     <date>          <lgl>    <date>    
-#> 1 1          some-town 2026-08-03      NA       NA        
-#> 2 2          some-town 2026-08-06      NA       NA        
+#> 1 1          some-town 2026-09-14      NA       NA        
+#> 2 2          some-town 2026-09-17      NA       NA        
 #> 3 3          some-town NA              NA       NA        
 #> 
 #> $exposures
 #> # A tibble: 4 × 3
 #>   contact_id date       exposure_type
 #>   <chr>      <date>     <chr>        
-#> 1 1          2026-08-01 normal       
-#> 2 1          2026-08-03 funeral      
-#> 3 2          2026-08-05 normal       
-#> 4 3          2026-08-05 normal       
+#> 1 1          2026-09-12 normal       
+#> 2 1          2026-09-14 funeral      
+#> 3 2          2026-09-16 normal       
+#> 4 3          2026-09-16 normal       
 #> 
 #> $risk
 #> # A tibble: 2 × 2

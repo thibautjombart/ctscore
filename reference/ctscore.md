@@ -39,7 +39,11 @@ to attach these scores to the `linelist` of the source `ctdata`.
 ## See also
 
 [`add_ctscore()`](thibautjombart.github.io/ctscore/reference/add_ctscore.md)
-to attach the scores back onto the `ctdata`.
+to attach the scores back onto the `ctdata`, and
+[`p_infected()`](thibautjombart.github.io/ctscore/reference/p_infected.md)
+and
+[`add_p_infected()`](thibautjombart.github.io/ctscore/reference/add_p_infected.md)
+to calculate the probability of infection for each contact.
 
 ## Author
 
@@ -50,8 +54,8 @@ Thibaut Jombart
 ``` r
 x <- make_ctdata(
   exposures = tibble::tibble(
-    contact_id    = c(1, 1, 2, 3, 4),
-    date          = Sys.Date() - c(6, 4, 5, 1, 5),
+    contact_id = c(1, 1, 2, 3, 4),
+    date = Sys.Date() - c(6, 4, 5, 1, 5),
     exposure_type = c("normal", "funeral", "normal", "normal", "null")
   ),
   linelist = tibble::tibble(
@@ -71,27 +75,33 @@ score
 #> 0.5266667 0.1000000 0.0000000 0.0000000 
 
 ## attach the scores to the ctdata linelist
-add_ctscore(x, score)
+res <- add_ctscore(x, score)
+
+## do the same with probabilities of infection for each contact
+## this can be useful for informing post exposure prophylaxis (PEP)
+p_inf <- p_infected(x)
+res <- add_p_infected(x, res)
+res
 #> <ctdata>: 4 contact(s), 5 exposure(s), 3 exposure type(s)
 #> 
 #> $linelist
 #> # A tibble: 4 × 6
-#>   contact_id location last_visit_date infected onset_date score
-#>   <chr>      <chr>    <date>          <lgl>    <date>     <dbl>
-#> 1 1          NA       2026-08-05      NA       NA         0.527
-#> 2 2          NA       2026-08-06      NA       NA         0.1  
-#> 3 3          NA       2026-08-06      NA       NA         0    
-#> 4 4          NA       2026-08-04      NA       NA         0    
+#>   contact_id location last_visit_date infected onset_date p_infected
+#>   <chr>      <chr>    <date>          <lgl>    <date>     <list>    
+#> 1 1          NA       2026-09-16      NA       NA         <NULL>    
+#> 2 2          NA       2026-09-17      NA       NA         <NULL>    
+#> 3 3          NA       2026-09-17      NA       NA         <NULL>    
+#> 4 4          NA       2026-09-15      NA       NA         <NULL>    
 #> 
 #> $exposures
 #> # A tibble: 5 × 3
 #>   contact_id date       exposure_type
 #>   <chr>      <date>     <chr>        
-#> 1 1          2026-08-01 normal       
-#> 2 1          2026-08-03 funeral      
-#> 3 2          2026-08-02 normal       
-#> 4 3          2026-08-06 normal       
-#> 5 4          2026-08-02 null         
+#> 1 1          2026-09-12 normal       
+#> 2 1          2026-09-14 funeral      
+#> 3 2          2026-09-13 normal       
+#> 4 3          2026-09-17 normal       
+#> 5 4          2026-09-13 null         
 #> 
 #> $risk
 #> # A tibble: 3 × 2

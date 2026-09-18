@@ -25,14 +25,6 @@ library(ctscore)
 library(rio)
 library(tibble)
 library(dplyr)
-#> 
-#> Attaching package: 'dplyr'
-#> The following objects are masked from 'package:stats':
-#> 
-#>     filter, lag
-#> The following objects are masked from 'package:base':
-#> 
-#>     intersect, setdiff, setequal, union
 library(ggplot2)
 
 ## use the path to your own file in practice
@@ -81,7 +73,7 @@ exposures
 #> # ℹ 36 more rows
 ```
 
-### Creating a `ctdata` object
+### Preparing the data: creating a `ctdata` object
 
 A `ctdata` object is a list containing three data frames:
 
@@ -178,6 +170,75 @@ plot(x)
 
 ![](reference/figures/README-unnamed-chunk-5-1.png)
 
+### Calculating probabilities of infection
+
+The probabilities that a given contact has been infected given their
+exposures can be calculated using
+[`p_infected()`](thibautjombart.github.io/ctscore/reference/p_infected.md):
+
+``` r
+
+p_inf <- p_infected(x)
+p_inf
+#>      1     10     11     12     13     14     15     16     17     18     19      2 
+#> 0.9000 0.9360 0.2000 0.9000 0.9920 0.9200 0.9000 0.2000 0.9000 0.3600 0.2000 0.2000 
+#>     20     21     22     23     24     25     26     27     28     29      3     30 
+#> 0.3600 0.9360 0.2000 0.9000 0.2000 0.9360 0.2000 0.2000 0.9000 0.9000 0.2000 0.9488 
+#>      4      5      6      7      8      9 
+#> 0.9000 0.2000 0.9000 0.9000 0.9000 0.4880
+```
+
+This information can be used, for instance, for informing post-exposure
+prophylaxis, to prioritise individuals at the highest risk of infection.
+This data can be attached to the dataset’s linelist using
+[`add_p_infected()`](thibautjombart.github.io/ctscore/reference/add_p_infected.md):
+
+``` r
+
+x <- add_p_infected(x, p_inf)
+x
+#> <ctdata>: 30 contact(s), 46 exposure(s), 2 exposure type(s)
+#> 
+#> $linelist
+#> # A tibble: 30 × 6
+#>    contact_id location   last_visit_date infected onset_date p_infected
+#>    <chr>      <chr>                <dbl> <lgl>         <dbl>      <dbl>
+#>  1 1          local_town              NA TRUE             22      0.9  
+#>  2 10         new_city                NA TRUE             11      0.936
+#>  3 11         new_city                NA TRUE             12      0.2  
+#>  4 12         new_city                NA FALSE            NA      0.9  
+#>  5 13         hotspot                  5 TRUE             14      0.992
+#>  6 14         hotspot                 NA TRUE             20      0.92 
+#>  7 15         hotspot                 27 FALSE            NA      0.9  
+#>  8 16         hotspot                 NA FALSE            NA      0.2  
+#>  9 17         hotspot                 NA TRUE             11      0.9  
+#> 10 18         local_town              28 FALSE            NA      0.36 
+#> # ℹ 20 more rows
+#> 
+#> $exposures
+#> # A tibble: 46 × 3
+#>    contact_id  date exposure_type
+#>    <chr>      <dbl> <chr>        
+#>  1 1             19 funeral      
+#>  2 10             2 household    
+#>  3 10             5 household    
+#>  4 10            13 funeral      
+#>  5 11            11 household    
+#>  6 12            18 funeral      
+#>  7 13             1 funeral      
+#>  8 13             8 funeral      
+#>  9 13            28 household    
+#> 10 14            15 funeral      
+#> # ℹ 36 more rows
+#> 
+#> $risk
+#> # A tibble: 2 × 2
+#>   exposure_type infection_proba
+#>   <chr>                   <dbl>
+#> 1 funeral                   0.9
+#> 2 household                 0.2
+```
+
 ### Scoring with `ctscore()`
 
 `ctscore` computes, for each contact, the probability that a visit today
@@ -211,7 +272,7 @@ plot(
 )
 ```
 
-![](reference/figures/README-unnamed-chunk-6-1.png)
+![](reference/figures/README-unnamed-chunk-8-1.png)
 
 We can now calculate the `score` using the
 [`ctscore()`](thibautjombart.github.io/ctscore/reference/ctscore.md)
@@ -260,7 +321,7 @@ xs$linelist |>
   )
 ```
 
-![](reference/figures/README-unnamed-chunk-9-1.png)
+![](reference/figures/README-unnamed-chunk-11-1.png)
 
 We can use
 [`as_tibble()`](https://tibble.tidyverse.org/reference/as_tibble.html)
@@ -273,16 +334,16 @@ whether to return one row per contact (TRUE) or one row per exposure
 
 as_tibble(xs) |>
   slice_max(score, n = 6)
-#> # A tibble: 6 × 9
-#>   contact_id  date exposure_type infection_proba location last_visit_date
-#>   <chr>      <dbl> <chr>                   <dbl> <chr>              <dbl>
-#> 1 13             1 funeral                   0.9 hotspot                5
-#> 2 13             8 funeral                   0.9 hotspot                5
-#> 3 13            28 household                 0.2 hotspot                5
-#> 4 21             1 funeral                   0.9 new_city              NA
-#> 5 21            17 household                 0.2 new_city              NA
-#> 6 21            30 household                 0.2 new_city              NA
-#> # ℹ 3 more variables: infected <lgl>, onset_date <dbl>, score <dbl>
+#> # A tibble: 6 × 10
+#>   contact_id  date exposure_type infection_proba location last_visit_date infected
+#>   <chr>      <dbl> <chr>                   <dbl> <chr>              <dbl> <lgl>   
+#> 1 13             1 funeral                   0.9 hotspot                5 TRUE    
+#> 2 13             8 funeral                   0.9 hotspot                5 TRUE    
+#> 3 13            28 household                 0.2 hotspot                5 TRUE    
+#> 4 21             1 funeral                   0.9 new_city              NA TRUE    
+#> 5 21            17 household                 0.2 new_city              NA TRUE    
+#> 6 21            30 household                 0.2 new_city              NA TRUE    
+#> # ℹ 3 more variables: onset_date <dbl>, p_infected <dbl>, score <dbl>
 ```
 
 The contact (ID 13) has the highest score because they had multiple
@@ -295,15 +356,15 @@ that this contact was infected and developed symptoms on day 14.
 
 as_tibble(xs) |>
   slice_min(score, n = 4)
-#> # A tibble: 5 × 9
-#>   contact_id  date exposure_type infection_proba location   last_visit_date
-#>   <chr>      <dbl> <chr>                   <dbl> <chr>                <dbl>
-#> 1 16            29 household                 0.2 hotspot                 NA
-#> 2 23            27 funeral                   0.9 local_town              30
-#> 3 27            19 household                 0.2 local_town              NA
-#> 4 18            10 household                 0.2 local_town              28
-#> 5 18            24 household                 0.2 local_town              28
-#> # ℹ 3 more variables: infected <lgl>, onset_date <dbl>, score <dbl>
+#> # A tibble: 5 × 10
+#>   contact_id  date exposure_type infection_proba location   last_visit_date infected
+#>   <chr>      <dbl> <chr>                   <dbl> <chr>                <dbl> <lgl>   
+#> 1 16            29 household                 0.2 hotspot                 NA FALSE   
+#> 2 23            27 funeral                   0.9 local_town              30 FALSE   
+#> 3 27            19 household                 0.2 local_town              NA TRUE    
+#> 4 18            10 household                 0.2 local_town              28 FALSE   
+#> 5 18            24 household                 0.2 local_town              28 FALSE   
+#> # ℹ 3 more variables: onset_date <dbl>, p_infected <dbl>, score <dbl>
 ```
 
 The lowest scoring contact had a single ‘weak’ exposure only 2 days ago,
@@ -434,4 +495,4 @@ plot(f) +
   facet_wrap(~location, scales = "free_y")
 ```
 
-![](reference/figures/README-unnamed-chunk-14-1.png)
+![](reference/figures/README-unnamed-chunk-16-1.png)
