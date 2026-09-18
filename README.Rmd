@@ -61,7 +61,7 @@ exposures
 ```
 
 
-### Creating a `ctdata` object
+### Preparing the data: creating a `ctdata` object
 
 A `ctdata` object is a list containing three data frames:
 
@@ -98,6 +98,28 @@ Smaller datasets can be visualised using `plot()`:
 ```{r}
 plot(x)
 ```
+
+
+### Calculating probabilities of infection
+
+The probabilities that a given contact has been infected given their exposures can be calculated using `p_infected()`:
+
+```{r}
+p_inf <- p_infected(x)
+p_inf
+```
+
+This information can be used, for instance, for informing post-exposure
+prophylaxis, to prioritise individuals at the highest risk of infection. This 
+data can be attached to the dataset's linelist using `add_p_infected()`:
+```{r}
+x <- add_p_infected(x, p_inf)
+x
+```
+
+
+
+
 
 ### Scoring with `ctscore()`
 
