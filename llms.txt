@@ -239,6 +239,24 @@ x
 #> 2 household                 0.2
 ```
 
+We can visualise the result:
+
+``` r
+
+
+ggplot(x$linelist, aes(x = p_infected, y = reorder(contact_id, p_infected))) +
+  geom_col() +
+  scale_x_continuous(n.breaks = 10, limits = c(0,1)) + 
+  theme_bw() +
+  labs(
+    x = "Probability of the contact being infected",
+    y = "Contact ID",
+    title = "Probability of infection"
+  )
+```
+
+![](reference/figures/README-unnamed-chunk-8-1.png)
+
 ### Scoring with `ctscore()`
 
 `ctscore` computes, for each contact, the probability that a visit today
@@ -272,7 +290,7 @@ plot(
 )
 ```
 
-![](reference/figures/README-unnamed-chunk-8-1.png)
+![](reference/figures/README-unnamed-chunk-9-1.png)
 
 We can now calculate the `score` using the
 [`ctscore()`](thibautjombart.github.io/ctscore/reference/ctscore.md)
@@ -313,6 +331,7 @@ can be useful for prioritising visits:
 xs$linelist |>
   ggplot(aes(x = score, y = reorder(contact_id, score))) +
   geom_col() +
+  scale_x_continuous(n.breaks = 10, limits = c(0,1)) + 
   theme_bw() +
   labs(
     x = "ctscore (probability of detecting symptoms)",
@@ -321,7 +340,7 @@ xs$linelist |>
   )
 ```
 
-![](reference/figures/README-unnamed-chunk-11-1.png)
+![](reference/figures/README-unnamed-chunk-12-1.png)
 
 We can use
 [`as_tibble()`](https://tibble.tidyverse.org/reference/as_tibble.html)
@@ -495,7 +514,7 @@ plot(f) +
   facet_wrap(~location, scales = "free_y")
 ```
 
-![](reference/figures/README-unnamed-chunk-16-1.png)
+![](reference/figures/README-unnamed-chunk-17-1.png)
 
 # Package index
 
